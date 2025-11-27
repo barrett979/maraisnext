@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  metrika:
+    build:
+      context: ./nextjs-app
+      dockerfile: Dockerfile
+    container_name: metrika
+    restart: unless-stopped
+    env_file:
+      - ./nextjs-app/.env
+    environment:
+      - NODE_ENV=production
+      - TZ=Europe/Moscow
+    volumes:
+      - ./nextjs-app/data.db:/app/data.db
+      - ./nextjs-app/metadata.db:/app/metadata.db
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.metrika.rule=Host(`app.marais.ru`)"
+      - "traefik.http.routers.metrika.entrypoints=websecure"
+      - "traefik.http.routers.metrika.tls.certresolver=letsencrypt"
+      - "traefik.http.services.metrika.loadbalancer.server.port=3000"
+
+networks:
+  traefik-net:
+    external: true
