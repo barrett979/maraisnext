@@ -1,0 +1,199 @@
+# ============================================
+# SECURITY - Files that MUST never be committed
+# ============================================
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.env
+.envrc
+
+# API keys and tokens
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+secrets/
+.secrets
+**/secrets.*
+api_keys.*
+tokens.*
+
+# Credentials and authentication
+credentials.json
+*credentials*.json
+service-account*.json
+*.keystore
+*.jks
+
+# SSH keys
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+*.ppk
+
+# OAuth tokens
+oauth_token*
+refresh_token*
+access_token*
+
+# ============================================
+# DATABASE - Local databases with potentially sensitive data
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
+nextjs-app/*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ============================================
+# DEPENDENCIES
+# ============================================
+node_modules/
+*/node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+vendor/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ============================================
+# BUILD OUTPUT
+# ============================================
+dist/
+build/
+out/
+.next/
+*.next/
+.nuxt/
+.output/
+.cache/
+*.tsbuildinfo
+
+# ============================================
+# IDE AND EDITOR
+# ============================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-*
+*.code-workspace
+
+# ============================================
+# OPERATING SYSTEM
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ============================================
+# LOGS AND DEBUG
+# ============================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+debug.log
+
+# ============================================
+# TESTING AND COVERAGE
+# ============================================
+coverage/
+.nyc_output/
+*.lcov
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+nosetests.xml
+test-results/
+jest-results/
+
+# ============================================
+# MISC
+# ============================================
+.vercel
+.turbo
+*.local
+.eslintcache
+.stylelintcache
+*.pid
+*.seed
+*.pid.lock
+
+# Backup files
+*.bak
+*.backup
+*.orig
+*.tmp
+*.temp
+
+# Archives (may contain sensitive data)
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Local config overrides
+*.local.json
+*.local.yaml
+*.local.yml
+config.local.*
+
+# Next.js specific
+next-env.d.ts
+
+# ============================================
+# AI/LLM TOOLS
+# ============================================
+.claude/
+.cursor/
+.copilot/
+.aider*
+.continue/
+
+# ============================================
+# PROJECT SPECIFIC
+# ============================================
+# Yandex Direct data exports (may contain business data)
+exports/
+reports/
+*.csv
+*.xlsx
+!templates/*.csv
+!templates/*.xlsx
