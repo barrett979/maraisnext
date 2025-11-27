@@ -19,6 +19,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.metrika.rule=Host(`app.marais.ru`)"
       - "traefik.http.routers.metrika.entrypoints=web"
+      - "traefik.http.routers.metrika.priority=100"
       - "traefik.http.services.metrika.loadbalancer.server.port=3000"
 
 networks:
