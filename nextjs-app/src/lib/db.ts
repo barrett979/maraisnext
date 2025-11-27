@@ -1,8 +1,9 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 
-const DB_PATH = path.join(process.cwd(), 'data.db');
-const METADATA_DB_PATH = path.join(process.cwd(), 'metadata.db');
+const DATA_DIR = path.join(process.cwd(), 'data');
+const DB_PATH = path.join(DATA_DIR, 'data.db');
+const METADATA_DB_PATH = path.join(DATA_DIR, 'metadata.db');
 
 let db: Database.Database | null = null;
 let metadataDb: Database.Database | null = null;

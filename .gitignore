@@ -47,10 +47,9 @@ access_token*
 *.db
 *.sqlite
 *.sqlite3
-data/*.db
 # TEMP: Allow test databases for deployment
-!nextjs-app/data.db
-!nextjs-app/metadata.db
+!data/data.db
+!data/metadata.db
 *.db-journal
 *.db-wal
 *.db-shm

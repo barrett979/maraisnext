@@ -7,7 +7,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import { getMetadataDb } from './db';
 
-const DB_PATH = path.join(process.cwd(), 'data.db');
+const DB_PATH = path.join(process.cwd(), 'data', 'data.db');
 const API_URL = 'https://api.direct.yandex.com/v5/reports';
 
 // Goal IDs
