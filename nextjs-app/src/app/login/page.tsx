@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -30,7 +32,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Errore durante il login');
+        setError(data.error || t('auth.loginError'));
         setLoading(false);
         return;
       }
@@ -38,7 +40,7 @@ export default function LoginPage() {
       router.push('/');
       router.refresh();
     } catch {
-      setError('Errore di connessione');
+      setError(t('common.connectionError'));
       setLoading(false);
     }
   };
@@ -47,33 +49,33 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Yandex Direct Dashboard</CardTitle>
+          <CardTitle className="text-2xl">{t('yandexDirect.title')} Dashboard</CardTitle>
           <p className="text-muted-foreground text-sm mt-2">
-            Accedi per visualizzare i dati
+            {t('auth.loginToView')}
           </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">{t('auth.username')}</Label>
               <Input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Inserisci username"
+                placeholder={t('auth.enterUsername')}
                 required
                 autoComplete="username"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Inserisci password"
+                placeholder={t('auth.enterPassword')}
                 required
                 autoComplete="current-password"
               />
@@ -89,10 +91,10 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Accesso in corso...
+                  {t('auth.loggingIn')}
                 </>
               ) : (
-                'Accedi'
+                t('auth.login')
               )}
             </Button>
           </form>

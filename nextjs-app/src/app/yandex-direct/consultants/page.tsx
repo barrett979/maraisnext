@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/table';
 import { PageFilters, useLocalFilters } from '@/components/page-filters';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/lib/i18n';
 import { TrendingUp, TrendingDown, Minus, Users, Target, MousePointer, Eye, ShoppingCart, CreditCard, Calendar } from 'lucide-react';
 import {
   LineChart,
@@ -126,6 +127,7 @@ function ComparisonCard({
   metric,
   format = 'number',
   inverted = false,
+  consultantLabel,
 }: {
   title: string;
   icon: React.ElementType;
@@ -134,6 +136,7 @@ function ComparisonCard({
   metric: keyof PerformanceMetrics;
   format?: 'number' | 'currency' | 'percent' | 'decimal';
   inverted?: boolean;
+  consultantLabel: string;
 }) {
   const consultantValue = consultant?.current[metric] ?? 0;
   const baselineValue = baseline?.current[metric] ?? 0;
@@ -141,7 +144,7 @@ function ComparisonCard({
   const formatValue = (val: number) => {
     switch (format) {
       case 'currency':
-        return val.toLocaleString() + ' ₽';
+        return Math.round(val).toLocaleString() + ' ₽';
       case 'percent':
         return val.toFixed(2) + '%';
       case 'decimal':
@@ -163,7 +166,7 @@ function ComparisonCard({
       <CardContent>
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <div className="text-xs text-muted-foreground mb-1">{consultant?.name || 'Consulente'}</div>
+            <div className="text-xs text-muted-foreground mb-1">{consultant?.name || consultantLabel}</div>
             <div className="text-xl font-bold" style={{ color: consultant?.color }}>
               {formatValue(consultantValue)}
             </div>
@@ -190,13 +193,13 @@ function ComparisonCard({
 }
 
 // Score Card per valutazione sintetica
-function ScoreCard({ consultant, baseline }: { consultant: ConsultantData | undefined; baseline: ConsultantData | undefined }) {
+function ScoreCard({ consultant, baseline, t, locale }: { consultant: ConsultantData | undefined; baseline: ConsultantData | undefined; t: (key: string) => string; locale: string }) {
   if (!consultant || consultant.current.cost === 0) {
     return (
       <Card className="bg-muted/50">
         <CardContent className="p-6">
           <div className="text-center text-muted-foreground">
-            Nessuna campagna assegnata
+            {t('yandexDirect.noCampaignsAssigned')}
           </div>
         </CardContent>
       </Card>
@@ -213,7 +216,7 @@ function ScoreCard({ consultant, baseline }: { consultant: ConsultantData | unde
     scores.push({
       metric: 'CPA',
       score: cpaScore,
-      label: cpaRatio < 1 ? `${Math.round((1 - cpaRatio) * 100)}% migliore` : `${Math.round((cpaRatio - 1) * 100)}% peggiore`,
+      label: cpaRatio < 1 ? `${Math.round((1 - cpaRatio) * 100)}% ${t('yandexDirect.betterBy').split(' ')[0]}` : `${Math.round((cpaRatio - 1) * 100)}% ${t('yandexDirect.worseBy').split(' ')[0]}`,
     });
   }
 
@@ -224,7 +227,7 @@ function ScoreCard({ consultant, baseline }: { consultant: ConsultantData | unde
     scores.push({
       metric: 'CR%',
       score: crScore,
-      label: crRatio > 1 ? `${Math.round((crRatio - 1) * 100)}% migliore` : `${Math.round((1 - crRatio) * 100)}% peggiore`,
+      label: crRatio > 1 ? `${Math.round((crRatio - 1) * 100)}% ${t('yandexDirect.betterBy').split(' ')[0]}` : `${Math.round((1 - crRatio) * 100)}% ${t('yandexDirect.worseBy').split(' ')[0]}`,
     });
   }
 
@@ -235,7 +238,7 @@ function ScoreCard({ consultant, baseline }: { consultant: ConsultantData | unde
     scores.push({
       metric: 'CTR',
       score: ctrScore,
-      label: ctrRatio > 1 ? `${Math.round((ctrRatio - 1) * 100)}% migliore` : `${Math.round((1 - ctrRatio) * 100)}% peggiore`,
+      label: ctrRatio > 1 ? `${Math.round((ctrRatio - 1) * 100)}% ${t('yandexDirect.betterBy').split(' ')[0]}` : `${Math.round((1 - ctrRatio) * 100)}% ${t('yandexDirect.worseBy').split(' ')[0]}`,
     });
   }
 
@@ -246,9 +249,9 @@ function ScoreCard({ consultant, baseline }: { consultant: ConsultantData | unde
       : 0;
     const trendScore = cpaTrend < -0.1 ? 100 : cpaTrend < 0 ? 80 : cpaTrend < 0.1 ? 60 : cpaTrend < 0.2 ? 40 : 20;
     scores.push({
-      metric: 'Trend',
+      metric: t('yandexDirect.trend'),
       score: trendScore,
-      label: cpaTrend < 0 ? 'In miglioramento' : cpaTrend > 0.1 ? 'In peggioramento' : 'Stabile',
+      label: cpaTrend < 0 ? t('yandexDirect.improving') : cpaTrend > 0.1 ? t('yandexDirect.worsening') : t('yandexDirect.stable'),
     });
   }
 
@@ -286,12 +289,12 @@ function ScoreCard({ consultant, baseline }: { consultant: ConsultantData | unde
           ))}
           <div className="pt-2 border-t mt-2 space-y-1">
             <div className="text-xs text-muted-foreground">
-              {consultant.current.campaignsCount} campagne gestite | Budget: {consultant.current.cost.toLocaleString()} ₽
+              {consultant.current.campaignsCount} {t('yandexDirect.campaignsManaged')} | {t('yandexDirect.budget')}: {Math.round(consultant.current.cost).toLocaleString()} ₽
             </div>
             {consultant.startDate && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Calendar className="h-3 w-3" />
-                <span>Con noi dal {new Date(consultant.startDate).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                <span>{t('yandexDirect.withUsSince')} {new Date(consultant.startDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'it-IT', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </div>
             )}
           </div>
@@ -302,6 +305,7 @@ function ScoreCard({ consultant, baseline }: { consultant: ConsultantData | unde
 }
 
 export default function ConsultantsPage() {
+  const { t, locale } = useI18n();
   const { days, setDays } = useLocalFilters();
   const [data, setData] = useState<PerformanceResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -372,9 +376,9 @@ export default function ConsultantsPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Valutazione Consulenti</h1>
+          <h1 className="text-2xl font-bold">{t('yandexDirect.consultantsTitle')}</h1>
           <p className="text-muted-foreground">
-            Confronto performance vs baseline Marais
+            {t('yandexDirect.consultantsSubtitle')}
           </p>
         </div>
         <div className="flex gap-2 items-center">
@@ -384,10 +388,10 @@ export default function ConsultantsPage() {
           />
           <Select value={selectedConsultant} onValueChange={setSelectedConsultant}>
             <SelectTrigger className="w-48 h-9">
-              <SelectValue placeholder="Seleziona consulente" />
+              <SelectValue placeholder={t('yandexDirect.selectConsultant')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tutti i consulenti</SelectItem>
+              <SelectItem value="all">{t('yandexDirect.allConsultants')}</SelectItem>
               {consultants.map(c => (
                 <SelectItem key={c.name} value={c.name}>
                   <div className="flex items-center gap-2">
@@ -405,7 +409,7 @@ export default function ConsultantsPage() {
       {selectedConsultant === 'all' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {consultants.map(c => (
-            <ScoreCard key={c.name} consultant={c} baseline={baseline} />
+            <ScoreCard key={c.name} consultant={c} baseline={baseline} t={t} locale={locale} />
           ))}
         </div>
       )}
@@ -415,32 +419,32 @@ export default function ConsultantsPage() {
         <>
           {/* Score Card prominente */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <ScoreCard consultant={selectedData} baseline={baseline} />
+            <ScoreCard consultant={selectedData} baseline={baseline} t={t} locale={locale} />
 
             {/* KPI principali */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>Metriche Chiave</CardTitle>
+                <CardTitle>{t('yandexDirect.keyMetrics')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <div className="text-xs text-muted-foreground">Budget Gestito</div>
-                    <div className="text-2xl font-bold">{selectedData.current.cost.toLocaleString()} ₽</div>
+                    <div className="text-xs text-muted-foreground">{t('yandexDirect.budgetManaged')}</div>
+                    <div className="text-2xl font-bold">{Math.round(selectedData.current.cost).toLocaleString()} ₽</div>
                     <ChangeIndicator change={calcChange(selectedData.current.cost, selectedData.previous?.cost)} />
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">Conversioni</div>
+                    <div className="text-xs text-muted-foreground">{t('yandexDirect.conversions')}</div>
                     <div className="text-2xl font-bold">{selectedData.current.purchase}</div>
                     <ChangeIndicator change={calcChange(selectedData.current.purchase, selectedData.previous?.purchase)} />
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">CPA</div>
-                    <div className="text-2xl font-bold">{selectedData.current.cpa.toLocaleString()} ₽</div>
+                    <div className="text-xs text-muted-foreground">{t('metrics.cpa')}</div>
+                    <div className="text-2xl font-bold">{Math.round(selectedData.current.cpa).toLocaleString()} ₽</div>
                     <ChangeIndicator change={calcChange(selectedData.current.cpa, selectedData.previous?.cpa)} inverted />
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">CR%</div>
+                    <div className="text-xs text-muted-foreground">{t('metrics.cr')}</div>
                     <div className="text-2xl font-bold">{selectedData.current.cr.toFixed(2)}%</div>
                     <ChangeIndicator change={calcChange(selectedData.current.cr, selectedData.previous?.cr)} />
                   </div>
@@ -452,38 +456,42 @@ export default function ConsultantsPage() {
           {/* KPI Comparison Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <ComparisonCard
-              title="CPA (Costo per Acquisto)"
+              title={t('yandexDirect.costPerPurchase')}
               icon={CreditCard}
               consultant={selectedData}
               baseline={baseline}
               metric="cpa"
               format="currency"
               inverted
+              consultantLabel={t('yandexDirect.consultant')}
             />
             <ComparisonCard
-              title="CR% (Conversion Rate)"
+              title={t('yandexDirect.conversionRate')}
               icon={ShoppingCart}
               consultant={selectedData}
               baseline={baseline}
               metric="cr"
               format="percent"
+              consultantLabel={t('yandexDirect.consultant')}
             />
             <ComparisonCard
-              title="CTR% (Click-Through Rate)"
+              title={t('yandexDirect.clickThroughRate')}
               icon={MousePointer}
               consultant={selectedData}
               baseline={baseline}
               metric="ctr"
               format="percent"
+              consultantLabel={t('yandexDirect.consultant')}
             />
             <ComparisonCard
-              title="Pos. Media"
+              title={t('yandexDirect.avgPosition')}
               icon={Target}
               consultant={selectedData}
               baseline={baseline}
               metric="avgPosition"
               format="decimal"
               inverted
+              consultantLabel={t('yandexDirect.consultant')}
             />
           </div>
 
@@ -492,7 +500,7 @@ export default function ConsultantsPage() {
             {/* CPA Timeline Comparison */}
             <Card>
               <CardHeader>
-                <CardTitle>CPA nel Tempo: {selectedData.name} vs Marais</CardTitle>
+                <CardTitle>{t('yandexDirect.cpaOverTime')}: {selectedData.name} {t('yandexDirect.vsMarais')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -526,7 +534,7 @@ export default function ConsultantsPage() {
             {/* Metrics Bar Comparison */}
             <Card>
               <CardHeader>
-                <CardTitle>Confronto Metriche</CardTitle>
+                <CardTitle>{t('yandexDirect.metricsComparison')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -547,19 +555,19 @@ export default function ConsultantsPage() {
           {/* Dettaglio Campagne */}
           <Card>
             <CardHeader>
-              <CardTitle>Campagne Gestite da {selectedData.name}</CardTitle>
+              <CardTitle>{t('yandexDirect.campaignsManagedBy')} {selectedData.name}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Campagna</TableHead>
-                      <TableHead className="text-right">Spesa</TableHead>
-                      <TableHead className="text-right">Conversioni</TableHead>
-                      <TableHead className="text-right">CPA</TableHead>
-                      <TableHead className="text-right">CR%</TableHead>
-                      <TableHead className="text-right">vs Marais CPA</TableHead>
+                      <TableHead>{t('metrics.campaign')}</TableHead>
+                      <TableHead className="text-right">{t('yandexDirect.spending')}</TableHead>
+                      <TableHead className="text-right">{t('yandexDirect.conversions')}</TableHead>
+                      <TableHead className="text-right">{t('metrics.cpa')}</TableHead>
+                      <TableHead className="text-right">{t('metrics.cr')}</TableHead>
+                      <TableHead className="text-right">{t('yandexDirect.vsMaraisCpa')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -574,9 +582,9 @@ export default function ConsultantsPage() {
                               {campaign.campaign}
                             </span>
                           </TableCell>
-                          <TableCell className="text-right">{campaign.cost.toLocaleString()} ₽</TableCell>
+                          <TableCell className="text-right">{Math.round(campaign.cost).toLocaleString()} ₽</TableCell>
                           <TableCell className="text-right">{campaign.purchase}</TableCell>
-                          <TableCell className="text-right">{campaign.cpa.toLocaleString()} ₽</TableCell>
+                          <TableCell className="text-right">{Math.round(campaign.cpa).toLocaleString()} ₽</TableCell>
                           <TableCell className="text-right">{campaign.cr.toFixed(2)}%</TableCell>
                           <TableCell className="text-right">
                             <ChangeIndicator change={cpaDiff} inverted />
@@ -596,21 +604,21 @@ export default function ConsultantsPage() {
       {selectedConsultant === 'all' && (
         <Card>
           <CardHeader>
-            <CardTitle>Tabella Comparativa</CardTitle>
+            <CardTitle>{t('yandexDirect.comparativeTable')}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Consulente</TableHead>
-                    <TableHead>Inizio</TableHead>
-                    <TableHead className="text-right">Campagne</TableHead>
-                    <TableHead className="text-right">Budget</TableHead>
-                    <TableHead className="text-right">Conversioni</TableHead>
-                    <TableHead className="text-right">CPA</TableHead>
-                    <TableHead className="text-right">vs Marais</TableHead>
-                    <TableHead className="text-right">CR%</TableHead>
+                    <TableHead>{t('yandexDirect.consultant')}</TableHead>
+                    <TableHead>{t('yandexDirect.startDate')}</TableHead>
+                    <TableHead className="text-right">{t('yandexDirect.campaigns')}</TableHead>
+                    <TableHead className="text-right">{t('yandexDirect.budget')}</TableHead>
+                    <TableHead className="text-right">{t('yandexDirect.conversions')}</TableHead>
+                    <TableHead className="text-right">{t('metrics.cpa')}</TableHead>
+                    <TableHead className="text-right">{t('yandexDirect.vsMarais')}</TableHead>
+                    <TableHead className="text-right">{t('metrics.cr')}</TableHead>
                     <TableHead className="text-right">CTR%</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -621,16 +629,16 @@ export default function ConsultantsPage() {
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-[#f97316]" />
-                          Marais (Baseline)
+                          Marais ({t('yandexDirect.baseline')})
                         </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
-                        {baseline.startDate ? new Date(baseline.startDate).toLocaleDateString('it-IT', { month: 'short', year: '2-digit' }) : '-'}
+                        {baseline.startDate ? new Date(baseline.startDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'it-IT', { month: 'short', year: '2-digit' }) : '-'}
                       </TableCell>
                       <TableCell className="text-right">{baseline.current.campaignsCount}</TableCell>
-                      <TableCell className="text-right">{baseline.current.cost.toLocaleString()} ₽</TableCell>
+                      <TableCell className="text-right">{Math.round(baseline.current.cost).toLocaleString()} ₽</TableCell>
                       <TableCell className="text-right">{baseline.current.purchase}</TableCell>
-                      <TableCell className="text-right">{baseline.current.cpa.toLocaleString()} ₽</TableCell>
+                      <TableCell className="text-right">{Math.round(baseline.current.cpa).toLocaleString()} ₽</TableCell>
                       <TableCell className="text-right text-muted-foreground">-</TableCell>
                       <TableCell className="text-right">{baseline.current.cr.toFixed(2)}%</TableCell>
                       <TableCell className="text-right">{baseline.current.ctr.toFixed(2)}%</TableCell>
@@ -649,12 +657,12 @@ export default function ConsultantsPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-muted-foreground text-sm">
-                          {c.startDate ? new Date(c.startDate).toLocaleDateString('it-IT', { month: 'short', year: '2-digit' }) : '-'}
+                          {c.startDate ? new Date(c.startDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'it-IT', { month: 'short', year: '2-digit' }) : '-'}
                         </TableCell>
                         <TableCell className="text-right">{c.current.campaignsCount}</TableCell>
-                        <TableCell className="text-right">{c.current.cost.toLocaleString()} ₽</TableCell>
+                        <TableCell className="text-right">{Math.round(c.current.cost).toLocaleString()} ₽</TableCell>
                         <TableCell className="text-right">{c.current.purchase}</TableCell>
-                        <TableCell className="text-right">{c.current.cpa.toLocaleString()} ₽</TableCell>
+                        <TableCell className="text-right">{Math.round(c.current.cpa).toLocaleString()} ₽</TableCell>
                         <TableCell className="text-right">
                           <ChangeIndicator change={cpaDiff} inverted />
                         </TableCell>

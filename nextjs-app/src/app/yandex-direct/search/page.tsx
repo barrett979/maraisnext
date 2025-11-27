@@ -23,6 +23,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageFilters, useLocalFilters } from '@/components/page-filters';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/lib/i18n';
 
 interface SearchQuery {
   query: string;
@@ -107,6 +108,7 @@ function SortableHeader({
 }
 
 export default function SearchPage() {
+  const { t } = useI18n();
   const { days, setDays, campaign, setCampaign, campaigns } = useLocalFilters({ fetchCampaigns: true });
   const [data, setData] = useState<SearchData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -179,7 +181,7 @@ export default function SearchPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-bold">Search Queries</h1>
+        <h1 className="text-2xl font-bold">{t('yandexDirect.searchQueries')}</h1>
         <div className="flex gap-2 flex-wrap items-center">
           <PageFilters
             days={days}
@@ -190,19 +192,19 @@ export default function SearchPage() {
             showCampaignFilter={true}
           />
           <Input
-            placeholder="Search queries..."
+            placeholder={t('yandexDirect.searchPlaceholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-48 h-9"
           />
           <Select value={criteriaType} onValueChange={(v) => { setCriteriaType(v); setOffset(0); }}>
             <SelectTrigger className="w-36 h-9">
-              <SelectValue placeholder="All types" />
+              <SelectValue placeholder={t('yandexDirect.allTypes')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">All types</SelectItem>
-              <SelectItem value="KEYWORD">Keyword</SelectItem>
-              <SelectItem value="AUTOTARGETING">Autotargeting</SelectItem>
+              <SelectItem value="__all__">{t('yandexDirect.allTypes')}</SelectItem>
+              <SelectItem value="KEYWORD">{t('yandexDirect.keyword')}</SelectItem>
+              <SelectItem value="AUTOTARGETING">{t('yandexDirect.autotargeting')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -226,7 +228,7 @@ export default function SearchPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Queries
+                  {t('yandexDirect.queries')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -238,7 +240,7 @@ export default function SearchPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Clicks
+                  {t('metrics.clicks')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -250,19 +252,19 @@ export default function SearchPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Cost
+                  {t('metrics.cost')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {data?.totals.cost.toLocaleString()}
+                  {Math.round(data?.totals.cost || 0).toLocaleString()} ₽
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Purchases
+                  {t('metrics.purchases')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -274,19 +276,19 @@ export default function SearchPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  CPA
+                  {t('metrics.cpa')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {data?.totals.cpa.toFixed(0)}
+                  {Math.round(data?.totals.cpa || 0).toLocaleString()} ₽
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  CR
+                  {t('metrics.cr')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -303,17 +305,17 @@ export default function SearchPage() {
       {!loading && data && (
         <div className="flex gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <Badge variant="outline">KEYWORD</Badge>
+            <Badge variant="outline">{t('yandexDirect.keyword')}</Badge>
             <span className="text-muted-foreground">
-              {data.totals_by_type.KEYWORD.count} queries,
-              {data.totals_by_type.KEYWORD.purchase} purchases
+              {data.totals_by_type.KEYWORD.count} {t('yandexDirect.queries').toLowerCase()},
+              {data.totals_by_type.KEYWORD.purchase} {t('metrics.purchases').toLowerCase()}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary">AUTO</Badge>
+            <Badge variant="secondary">{t('yandexDirect.autotargeting')}</Badge>
             <span className="text-muted-foreground">
-              {data.totals_by_type.AUTOTARGETING.count} queries,
-              {data.totals_by_type.AUTOTARGETING.purchase} purchases
+              {data.totals_by_type.AUTOTARGETING.count} {t('yandexDirect.queries').toLowerCase()},
+              {data.totals_by_type.AUTOTARGETING.purchase} {t('metrics.purchases').toLowerCase()}
             </span>
           </div>
         </div>
@@ -326,8 +328,8 @@ export default function SearchPage() {
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
-                  <SortableHeader column="query" label="Query" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[300px]" />
-                  <TableHead>Type</TableHead>
+                  <SortableHeader column="query" label={t('yandexDirect.query')} currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[300px]" />
+                  <TableHead>{t('yandexDirect.type')}</TableHead>
                   <SortableHeader column="clicks" label="Clicks" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
                   <SortableHeader column="cost" label="Cost" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
                   <SortableHeader column="purchase" label="Purch" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -364,14 +366,14 @@ export default function SearchPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-right">{q.clicks}</TableCell>
-                      <TableCell className="text-right">{q.cost.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">{Math.round(q.cost).toLocaleString()} ₽</TableCell>
                       <TableCell className="text-right">
                         <span className={q.purchase > 0 ? 'text-green-400 font-medium' : ''}>
                           {q.purchase}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
-                        {q.purchase > 0 ? q.cpa.toFixed(0) : '-'}
+                        {q.purchase > 0 ? `${Math.round(q.cpa).toLocaleString()} ₽` : '-'}
                       </TableCell>
                       <TableCell className="text-right">
                         <span className={q.cr >= 1 ? 'text-green-400' : q.cr > 0 ? 'text-yellow-400' : ''}>
@@ -401,7 +403,7 @@ export default function SearchPage() {
       {!loading && data && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {offset + 1}-{Math.min(offset + PAGE_SIZE, data.pagination.total)} of {data.pagination.total}
+            {t('yandexDirect.showing')} {offset + 1}-{Math.min(offset + PAGE_SIZE, data.pagination.total)} {t('yandexDirect.of')} {data.pagination.total}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -410,10 +412,10 @@ export default function SearchPage() {
               onClick={handlePrevPage}
               disabled={offset === 0}
             >
-              Previous
+              {t('yandexDirect.previous')}
             </Button>
             <span className="text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
+              {t('yandexDirect.page')} {currentPage} {t('yandexDirect.of')} {totalPages}
             </span>
             <Button
               variant="outline"
@@ -421,7 +423,7 @@ export default function SearchPage() {
               onClick={handleNextPage}
               disabled={!data.pagination.has_more}
             >
-              Next
+              {t('yandexDirect.next')}
             </Button>
           </div>
         </div>

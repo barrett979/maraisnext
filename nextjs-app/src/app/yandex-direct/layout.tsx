@@ -5,12 +5,19 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Search, Monitor, Users } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useI18n } from '@/lib/i18n';
 
-const tabs = [
-  { name: 'Dashboard', href: '/yandex-direct', icon: LayoutDashboard },
-  { name: 'Search Queries', href: '/yandex-direct/search', icon: Search },
-  { name: 'Display/YAN', href: '/yandex-direct/display', icon: Monitor },
-  { name: 'Consulenti', href: '/yandex-direct/consultants', icon: Users },
+interface Tab {
+  nameKey: string;
+  href: string;
+  icon: React.ElementType;
+}
+
+const tabs: Tab[] = [
+  { nameKey: 'yandexDirect.dashboard', href: '/yandex-direct', icon: LayoutDashboard },
+  { nameKey: 'yandexDirect.features.searchQueries', href: '/yandex-direct/search', icon: Search },
+  { nameKey: 'yandexDirect.features.displayYan', href: '/yandex-direct/display', icon: Monitor },
+  { nameKey: 'yandexDirect.features.consultants', href: '/yandex-direct/consultants', icon: Users },
 ];
 
 export default function YandexDirectLayout({
@@ -19,6 +26,7 @@ export default function YandexDirectLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { t } = useI18n();
 
   return (
     <div className="space-y-6">
@@ -35,7 +43,7 @@ export default function YandexDirectLayout({
 
               return (
                 <Link
-                  key={tab.name}
+                  key={tab.nameKey}
                   href={tab.href}
                   className={cn(
                     'flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors',
@@ -45,7 +53,7 @@ export default function YandexDirectLayout({
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {tab.name}
+                  {t(tab.nameKey)}
                 </Link>
               );
             })}

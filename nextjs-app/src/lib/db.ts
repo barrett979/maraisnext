@@ -1,7 +1,11 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+// In dev: process.cwd() = nextjs-app/, data is in ../data/
+// In prod (Docker): process.cwd() = /app/, data is in /app/data/
+const DATA_DIR = process.env.NODE_ENV === 'production'
+  ? path.join(process.cwd(), 'data')
+  : path.join(process.cwd(), '..', 'data');
 const DB_PATH = path.join(DATA_DIR, 'data.db');
 const METADATA_DB_PATH = path.join(DATA_DIR, 'metadata.db');
 
@@ -87,6 +91,29 @@ export function getMetadataDb(): Database.Database {
     const count = metadataDb.prepare('SELECT COUNT(*) as cnt FROM owners').get() as { cnt: number };
     if (count.cnt === 0) {
       metadataDb.prepare('INSERT INTO owners (name, color) VALUES (?, ?)').run('Vadim', '#3b82f6');
+    }
+    // Crea tabella users per autenticazione
+    metadataDb.exec(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        display_name TEXT,
+        role TEXT DEFAULT 'user',
+        language TEXT DEFAULT 'ru',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    // Migra: aggiungi colonna language se non esiste
+    try {
+      const userColumns = metadataDb.prepare("PRAGMA table_info(users)").all() as Array<{name: string}>;
+      const userColumnNames = userColumns.map(c => c.name);
+      if (!userColumnNames.includes('language')) {
+        metadataDb.exec(`ALTER TABLE users ADD COLUMN language TEXT DEFAULT 'ru'`);
+      }
+    } catch {
+      // Ignora errori di migrazione
     }
   }
   return metadataDb;

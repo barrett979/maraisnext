@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PageFilters, useLocalFilters } from '@/components/page-filters';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/lib/i18n';
 
 interface DisplayItem {
   campaign?: string;
@@ -98,6 +99,7 @@ function SortableHeader({
 }
 
 export default function DisplayPage() {
+  const { t } = useI18n();
   const { days, setDays, campaign } = useLocalFilters();
   const [data, setData] = useState<DisplayData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -186,14 +188,14 @@ export default function DisplayPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-bold">Display / YAN</h1>
+        <h1 className="text-2xl font-bold">{t('yandexDirect.displayYan')}</h1>
         <div className="flex gap-2 items-center">
           <PageFilters
             days={days}
             onDaysChange={setDays}
           />
           <Input
-            placeholder="Search..."
+            placeholder={t('common.search') + '...'}
             value={searchInput}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="w-64 h-9"
@@ -219,7 +221,7 @@ export default function DisplayPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Impressions
+                  {t('metrics.impressions')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -231,7 +233,7 @@ export default function DisplayPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Clicks
+                  {t('metrics.clicks')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -243,19 +245,19 @@ export default function DisplayPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Cost
+                  {t('metrics.cost')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {data?.totals.cost.toLocaleString()}
+                  {Math.round(data?.totals.cost || 0).toLocaleString()} ₽
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Purchases
+                  {t('metrics.purchases')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -267,19 +269,19 @@ export default function DisplayPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  CPA
+                  {t('metrics.cpa')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {data?.totals.cpa.toFixed(0)}
+                  {Math.round(data?.totals.cpa || 0).toLocaleString()} ₽
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  CR
+                  {t('metrics.cr')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -295,9 +297,9 @@ export default function DisplayPage() {
       {/* Tabs for different views */}
       <Tabs value={view} onValueChange={setView}>
         <TabsList>
-          <TabsTrigger value="adgroups">Ad Groups</TabsTrigger>
-          <TabsTrigger value="placements">Placements</TabsTrigger>
-          <TabsTrigger value="criteria">Criteria</TabsTrigger>
+          <TabsTrigger value="adgroups">{t('yandexDirect.adGroups')}</TabsTrigger>
+          <TabsTrigger value="placements">{t('yandexDirect.placements')}</TabsTrigger>
+          <TabsTrigger value="criteria">{t('yandexDirect.criteria')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="adgroups" className="mt-4">
@@ -307,8 +309,8 @@ export default function DisplayPage() {
                 <Table>
                   <TableHeader className="sticky top-0 bg-background z-10">
                     <TableRow>
-                      <SortableHeader column="campaign" label="Campaign" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[200px]" />
-                      <SortableHeader column="adgroup" label="Ad Group" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[200px]" />
+                      <SortableHeader column="campaign" label={t('yandexDirect.campaign')} currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[200px]" />
+                      <SortableHeader column="adgroup" label={t('yandexDirect.adGroup')} currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[200px]" />
                       <SortableHeader column="impressions" label="Impr" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
                       <SortableHeader column="clicks" label="Clicks" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
                       <SortableHeader column="cost" label="Cost" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -340,14 +342,14 @@ export default function DisplayPage() {
                           </TableCell>
                           <TableCell className="text-right">{item.impressions.toLocaleString()}</TableCell>
                           <TableCell className="text-right">{item.clicks}</TableCell>
-                          <TableCell className="text-right">{item.cost.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{Math.round(item.cost).toLocaleString()} ₽</TableCell>
                           <TableCell className="text-right">
                             <span className={item.purchase > 0 ? 'text-green-400 font-medium' : ''}>
                               {item.purchase}
                             </span>
                           </TableCell>
                           <TableCell className="text-right">
-                            {item.purchase > 0 ? item.cpa.toFixed(0) : '-'}
+                            {item.purchase > 0 ? `${Math.round(item.cpa).toLocaleString()} ₽` : '-'}
                           </TableCell>
                           <TableCell className="text-right">
                             <span className={item.cr >= 1 ? 'text-green-400' : ''}>
@@ -372,7 +374,7 @@ export default function DisplayPage() {
                 <Table>
                   <TableHeader className="sticky top-0 bg-background z-10">
                     <TableRow>
-                      <SortableHeader column="placement" label="Placement" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[300px]" />
+                      <SortableHeader column="placement" label={t('yandexDirect.placement')} currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[300px]" />
                       <SortableHeader column="impressions" label="Impr" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
                       <SortableHeader column="clicks" label="Clicks" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
                       <SortableHeader column="cost" label="Cost" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -401,14 +403,14 @@ export default function DisplayPage() {
                           </TableCell>
                           <TableCell className="text-right">{item.impressions.toLocaleString()}</TableCell>
                           <TableCell className="text-right">{item.clicks}</TableCell>
-                          <TableCell className="text-right">{item.cost.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{Math.round(item.cost).toLocaleString()} ₽</TableCell>
                           <TableCell className="text-right">
                             <span className={item.purchase > 0 ? 'text-green-400 font-medium' : ''}>
                               {item.purchase}
                             </span>
                           </TableCell>
                           <TableCell className="text-right">
-                            {item.purchase > 0 ? item.cpa.toFixed(0) : '-'}
+                            {item.purchase > 0 ? `${Math.round(item.cpa).toLocaleString()} ₽` : '-'}
                           </TableCell>
                           <TableCell className="text-right">
                             <span className={item.cr >= 1 ? 'text-green-400' : ''}>
@@ -433,8 +435,8 @@ export default function DisplayPage() {
                 <Table>
                   <TableHeader className="sticky top-0 bg-background z-10">
                     <TableRow>
-                      <SortableHeader column="criteria" label="Criteria" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[250px]" />
-                      <TableHead>Type</TableHead>
+                      <SortableHeader column="criteria" label={t('yandexDirect.criteria')} currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="w-[250px]" />
+                      <TableHead>{t('yandexDirect.type')}</TableHead>
                       <SortableHeader column="impressions" label="Impr" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
                       <SortableHeader column="clicks" label="Clicks" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
                       <SortableHeader column="cost" label="Cost" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -458,7 +460,7 @@ export default function DisplayPage() {
                       items?.map((item, i) => (
                         <TableRow key={`${item.criteria}-${item.criteria_type}-${i}`}>
                           <TableCell className="font-medium truncate max-w-[250px]" title={item.criteria || '-'}>
-                            {item.criteria || '(empty)'}
+                            {item.criteria || t('yandexDirect.empty')}
                           </TableCell>
                           <TableCell>
                             <Badge variant="secondary" className="text-xs">
@@ -467,14 +469,14 @@ export default function DisplayPage() {
                           </TableCell>
                           <TableCell className="text-right">{item.impressions.toLocaleString()}</TableCell>
                           <TableCell className="text-right">{item.clicks}</TableCell>
-                          <TableCell className="text-right">{item.cost.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{Math.round(item.cost).toLocaleString()} ₽</TableCell>
                           <TableCell className="text-right">
                             <span className={item.purchase > 0 ? 'text-green-400 font-medium' : ''}>
                               {item.purchase}
                             </span>
                           </TableCell>
                           <TableCell className="text-right">
-                            {item.purchase > 0 ? item.cpa.toFixed(0) : '-'}
+                            {item.purchase > 0 ? `${Math.round(item.cpa).toLocaleString()} ₽` : '-'}
                           </TableCell>
                           <TableCell className="text-right">
                             <span className={item.cr >= 1 ? 'text-green-400' : ''}>
@@ -496,7 +498,7 @@ export default function DisplayPage() {
       {!loading && pagination && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {items.length} of {pagination.total} {view}
+            {t('yandexDirect.showing')} {items.length} {t('yandexDirect.of')} {pagination.total}
           </div>
           {pagination.has_more && (
             <Button
@@ -504,7 +506,7 @@ export default function DisplayPage() {
               onClick={loadMore}
               disabled={loadingMore}
             >
-              {loadingMore ? 'Loading...' : `Load more (${pagination.total - items.length} remaining)`}
+              {loadingMore ? t('yandexDirect.loadingMore') : `${t('yandexDirect.loadMore')} (${pagination.total - items.length} ${t('yandexDirect.remaining')})`}
             </Button>
           )}
         </div>

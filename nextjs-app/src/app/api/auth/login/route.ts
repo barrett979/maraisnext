@@ -13,16 +13,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!validateCredentials(username, password)) {
+    const user = validateCredentials(username, password);
+    if (!user) {
       return NextResponse.json(
         { error: 'Credenziali non valide' },
         { status: 401 }
       );
     }
 
-    const token = await createSession(username);
+    const token = await createSession(user);
 
-    const response = NextResponse.json({ success: true, user: username });
+    const response = NextResponse.json({
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.display_name,
+        role: user.role
+      }
+    });
 
     response.cookies.set(SESSION_COOKIE, token, {
       httpOnly: true,

@@ -8,14 +8,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useI18n } from '@/lib/i18n';
 
 const PERIOD_OPTIONS = [
-  { value: '7', label: '7 giorni' },
-  { value: '14', label: '14 giorni' },
-  { value: '30', label: '30 giorni' },
-  { value: '60', label: '60 giorni' },
-  { value: '90', label: '90 giorni' },
-  { value: '180', label: '180 giorni' },
+  { value: '7', labelKey: 'filters.last7days' },
+  { value: '14', labelKey: 'filters.last14days' },
+  { value: '30', labelKey: 'filters.last30days' },
+  { value: '60', labelKey: 'filters.last60days' },
+  { value: '90', labelKey: 'filters.last90days' },
+  { value: '180', labelKey: 'filters.last180days' },
 ];
 
 interface PageFiltersProps {
@@ -37,16 +38,18 @@ export function PageFilters({
   showCampaignFilter = false,
   className = '',
 }: PageFiltersProps) {
+  const { t } = useI18n();
+
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <Select value={days} onValueChange={onDaysChange}>
-        <SelectTrigger className="w-[130px] h-9">
-          <SelectValue placeholder="Periodo" />
+        <SelectTrigger className="w-[160px] h-9">
+          <SelectValue placeholder={t('filters.days')} />
         </SelectTrigger>
         <SelectContent>
           {PERIOD_OPTIONS.map(opt => (
             <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
+              {t(opt.labelKey)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -55,10 +58,10 @@ export function PageFilters({
       {showCampaignFilter && onCampaignChange && (
         <Select value={campaign || '__all__'} onValueChange={onCampaignChange}>
           <SelectTrigger className="w-[200px] h-9">
-            <SelectValue placeholder="Tutte le campagne" />
+            <SelectValue placeholder={t('filters.selectCampaign')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">Tutte le campagne</SelectItem>
+            <SelectItem value="__all__">{t('filters.allCampaigns')}</SelectItem>
             {campaigns.map(c => (
               <SelectItem key={c} value={c}>
                 <span className="truncate max-w-[180px] block">{c}</span>

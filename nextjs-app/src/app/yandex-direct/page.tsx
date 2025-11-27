@@ -20,8 +20,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PageFilters, useLocalFilters } from '@/components/page-filters';
+import { SyncStatus } from '@/components/sync-status';
 import { cn } from '@/lib/utils';
 import { UserPlus } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 import {
   LineChart,
   Line,
@@ -126,7 +128,7 @@ function calcChange(current: number, previous: number): number | null {
 }
 
 // Componente per mostrare la variazione rispetto al periodo precedente
-function ChangeIndicator({ change, inverted = false }: { change: number | null; inverted?: boolean }) {
+function ChangeIndicator({ change, inverted = false, label }: { change: number | null; inverted?: boolean; label: string }) {
   if (change === null) return null;
 
   // Per CPA/Cost, un valore negativo è positivo (costo diminuito)
@@ -135,7 +137,7 @@ function ChangeIndicator({ change, inverted = false }: { change: number | null; 
 
   return (
     <div className="flex items-center gap-1 mt-1">
-      <span className="text-xs text-muted-foreground">vs prec.</span>
+      <span className="text-xs text-muted-foreground">{label}</span>
       <span
         className={cn(
           'text-xs font-medium',
@@ -173,6 +175,7 @@ function InlineChange({ change, inverted = false }: { change: number | null; inv
 
 
 export default function Dashboard() {
+  const { t } = useI18n();
   const { days, setDays, campaign, setCampaign, campaigns } = useLocalFilters({ fetchCampaigns: true });
   const [data, setData] = useState<DashboardData | null>(null);
   const [breakdown, setBreakdown] = useState<BreakdownData | null>(null);
@@ -305,7 +308,10 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold">{t('yandexDirect.dashboard')}</h1>
+          <SyncStatus />
+        </div>
         <PageFilters
           days={days}
           onDaysChange={setDays}
@@ -334,79 +340,79 @@ export default function Dashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Impressions
+                  {t('metrics.impressions')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {totals?.impressions.toLocaleString()}
                 </div>
-                <ChangeIndicator change={changes?.impressions ?? null} />
+                <ChangeIndicator change={changes?.impressions ?? null} label={t('yandexDirect.vsPrevious')} />
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Clicks
+                  {t('metrics.clicks')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {totals?.clicks.toLocaleString()}
                 </div>
-                <ChangeIndicator change={changes?.clicks ?? null} />
+                <ChangeIndicator change={changes?.clicks ?? null} label={t('yandexDirect.vsPrevious')} />
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Cost
+                  {t('metrics.cost')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {totals?.cost.toLocaleString()}
+                  {Math.round(totals?.cost || 0).toLocaleString()} ₽
                 </div>
-                <ChangeIndicator change={changes?.cost ?? null} inverted />
+                <ChangeIndicator change={changes?.cost ?? null} inverted label={t('yandexDirect.vsPrevious')} />
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Purchases
+                  {t('metrics.purchases')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-400">
                   {totals?.purchase.toLocaleString()}
                 </div>
-                <ChangeIndicator change={changes?.purchase ?? null} />
+                <ChangeIndicator change={changes?.purchase ?? null} label={t('yandexDirect.vsPrevious')} />
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  CPA
+                  {t('metrics.cpa')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {cpa.toFixed(0)}
+                  {Math.round(cpa).toLocaleString()} ₽
                 </div>
-                <ChangeIndicator change={changes?.cpa ?? null} inverted />
+                <ChangeIndicator change={changes?.cpa ?? null} inverted label={t('yandexDirect.vsPrevious')} />
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  CR
+                  {t('metrics.cr')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {cr.toFixed(2)}%
                 </div>
-                <ChangeIndicator change={changes?.cr ?? null} />
+                <ChangeIndicator change={changes?.cr ?? null} label={t('yandexDirect.vsPrevious')} />
               </CardContent>
             </Card>
           </>
@@ -417,7 +423,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Conversions</CardTitle>
+            <CardTitle>{t('yandexDirect.conversions')}</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -464,7 +470,7 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Cost & Clicks</CardTitle>
+            <CardTitle>{t('yandexDirect.costClicks')}</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -510,7 +516,7 @@ export default function Dashboard() {
         {/* CPC & CPA Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>CPC & CPA nel Tempo</CardTitle>
+            <CardTitle>{t('yandexDirect.cpcCpaTime')}</CardTitle>
           </CardHeader>
           <CardContent>
             {loadingMetricsTimeline ? (
@@ -553,7 +559,7 @@ export default function Dashboard() {
         {/* Budget Distribution Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Distribuzione Budget: Search vs YAN</CardTitle>
+            <CardTitle>{t('yandexDirect.budgetDistribution')}</CardTitle>
           </CardHeader>
           <CardContent>
             {loadingMetricsTimeline ? (
@@ -594,7 +600,7 @@ export default function Dashboard() {
                     stroke="#6b7280"
                     fill="#6b7280"
                     fillOpacity={0.6}
-                    name="Altro"
+                    name={t('yandexDirect.other')}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -606,7 +612,7 @@ export default function Dashboard() {
       {/* Dettaglio Campagne */}
       <Card>
         <CardHeader>
-          <CardTitle>Dettaglio Campagne vs Periodo Precedente</CardTitle>
+          <CardTitle>{t('yandexDirect.campaignDetails')}</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {loadingBreakdown ? (
@@ -618,19 +624,19 @@ export default function Dashboard() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[220px]">Campaign</TableHead>
-                    <TableHead className="w-[100px]">Owner</TableHead>
-                    <TableHead className="text-right">Cost</TableHead>
+                    <TableHead className="w-[220px]">{t('metrics.campaign')}</TableHead>
+                    <TableHead className="w-[100px]">{t('metrics.owner')}</TableHead>
+                    <TableHead className="text-right">{t('metrics.cost')}</TableHead>
                     <TableHead className="text-right">%</TableHead>
-                    <TableHead className="text-right">Cart</TableHead>
+                    <TableHead className="text-right">{t('metrics.cart')}</TableHead>
                     <TableHead className="text-right">%</TableHead>
-                    <TableHead className="text-right">Check</TableHead>
+                    <TableHead className="text-right">{t('metrics.checkout')}</TableHead>
                     <TableHead className="text-right">%</TableHead>
-                    <TableHead className="text-right">Purch</TableHead>
+                    <TableHead className="text-right">{t('metrics.purchase')}</TableHead>
                     <TableHead className="text-right">%</TableHead>
-                    <TableHead className="text-right">CPA</TableHead>
+                    <TableHead className="text-right">{t('metrics.cpa')}</TableHead>
                     <TableHead className="text-right">%</TableHead>
-                    <TableHead className="text-right">CR%</TableHead>
+                    <TableHead className="text-right">{t('metrics.cr')}</TableHead>
                     <TableHead className="text-right">%</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -699,13 +705,13 @@ export default function Dashboard() {
                                 onClick={() => assignOwner(item.campaign_id, item.campaign, null)}
                                 className="text-red-400"
                               >
-                                Rimuovi owner
+                                {t('yandexDirect.removeOwner')}
                               </DropdownMenuItem>
                             )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
-                      <TableCell className="text-right">{item.current.cost.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">{Math.round(item.current.cost).toLocaleString()} ₽</TableCell>
                       <TableCell className="text-right">
                         <InlineChange change={item.changes?.cost ?? null} inverted />
                       </TableCell>
@@ -734,7 +740,7 @@ export default function Dashboard() {
                         <InlineChange change={item.changes?.purchase ?? null} />
                       </TableCell>
                       <TableCell className="text-right">
-                        {item.current.cpa > 0 ? item.current.cpa.toLocaleString() : '-'}
+                        {item.current.cpa > 0 ? `${Math.round(item.current.cpa).toLocaleString()} ₽` : '-'}
                       </TableCell>
                       <TableCell className="text-right">
                         <InlineChange change={item.changes?.cpa ?? null} inverted />

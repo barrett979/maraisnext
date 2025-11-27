@@ -7,7 +7,12 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import { getMetadataDb } from './db';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'data.db');
+// In dev: process.cwd() = nextjs-app/, data is in ../data/
+// In prod (Docker): process.cwd() = /app/, data is in /app/data/
+const DATA_DIR = process.env.NODE_ENV === 'production'
+  ? path.join(process.cwd(), 'data')
+  : path.join(process.cwd(), '..', 'data');
+const DB_PATH = path.join(DATA_DIR, 'data.db');
 const API_URL = 'https://api.direct.yandex.com/v5/reports';
 
 // Goal IDs
