@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   metrika:
     build:
@@ -16,7 +14,7 @@ services:
       - ./nextjs-app/data.db:/app/data.db
       - ./nextjs-app/metadata.db:/app/metadata.db
     networks:
-      - traefik-net
+      - wg-pihole
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.metrika.rule=Host(`app.marais.ru`)"
@@ -25,5 +23,5 @@ services:
       - "traefik.http.services.metrika.loadbalancer.server.port=3000"
 
 networks:
-  traefik-net:
+  wg-pihole:
     external: true
