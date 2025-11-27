@@ -108,7 +108,7 @@ export default function DisplayPage() {
   const [allItems, setAllItems] = useState<DisplayItem[]>([]);
   const [sortBy, setSortBy] = useState('cost');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
-  const searchTimeout = useRef<NodeJS.Timeout>();
+  const searchTimeout = useRef<NodeJS.Timeout>(undefined);
 
   const fetchData = useCallback(async (offset = 0, append = false) => {
     if (offset === 0) {
