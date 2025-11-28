@@ -13,7 +13,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Check, X, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Check, X, Sparkles, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { ImageZoom } from '@/components/image-zoom';
 
 interface ProductDetail {
@@ -146,6 +147,11 @@ export function ProductDetailSheet({
     return { description: cleanDescription, specs };
   };
 
+  // Build product URL on marais.ru
+  const getProductUrl = (slug: string): string => {
+    return `https://www.marais.ru/product/${slug}`;
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col h-full">
@@ -181,6 +187,24 @@ export function ProductDetailSheet({
                 <Badge variant="destructive">{t('catalog.sale')}</Badge>
               )}
             </div>
+          )}
+          {/* Open on site button */}
+          {product?.slug && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              asChild
+            >
+              <a
+                href={getProductUrl(product.slug)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                {t('catalog.openOnSite')}
+              </a>
+            </Button>
           )}
         </SheetHeader>
 

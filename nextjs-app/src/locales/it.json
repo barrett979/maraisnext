@@ -250,6 +250,7 @@
     "main": "Principale",
     "sale": "Saldo",
     "created": "Creato",
-    "updated": "Aggiornato"
+    "updated": "Aggiornato",
+    "openOnSite": "Apri sul sito"
   }
 }
