@@ -91,6 +91,7 @@ export const CACHE_KEYS = {
   PRODUCT_BRANDS: 'products:brands',
   PRODUCT_CATEGORIES: 'products:categories',
   PRODUCT_SEASONS: 'products:seasons',
+  PRODUCT_COLORS: 'products:colors',
 } as const;
 
 // Default TTL: 5 minutes

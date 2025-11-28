@@ -34,6 +34,10 @@ interface SeasonRow {
   attribute_value: string;
 }
 
+interface ColorRow {
+  attribute_value: string;
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 
@@ -51,6 +55,7 @@ export async function GET(request: NextRequest) {
   const novinki = searchParams.get('novinki') || '';
   const category = searchParams.get('category') || '';
   const season = searchParams.get('season') || '';
+  const color = searchParams.get('color') || '';
 
   // Sorting
   const sortBy = searchParams.get('sortBy') || 'date_updated';
@@ -111,6 +116,13 @@ export async function GET(request: NextRequest) {
   if (season) {
     conditions.push(`EXISTS (SELECT 1 FROM product_attributes pa WHERE pa.product_id = p.id AND pa.attribute_name = 'season' AND pa.attribute_value = $${paramIndex})`);
     params.push(season);
+    paramIndex++;
+  }
+
+  // Color filter (from product_attributes table)
+  if (color) {
+    conditions.push(`EXISTS (SELECT 1 FROM product_attributes pa WHERE pa.product_id = p.id AND pa.attribute_name = 'color' AND pa.attribute_value = $${paramIndex})`);
+    params.push(color);
     paramIndex++;
   }
 
@@ -189,6 +201,17 @@ export async function GET(request: NextRequest) {
       DEFAULT_TTL
     );
 
+    const colors = await cache.getOrSet<ColorRow[]>(
+      CACHE_KEYS.PRODUCT_COLORS,
+      () => query<ColorRow>(`
+        SELECT DISTINCT attribute_value
+        FROM product_attributes
+        WHERE attribute_name = 'color' AND attribute_value IS NOT NULL AND attribute_value != ''
+        ORDER BY attribute_value
+      `),
+      DEFAULT_TTL
+    );
+
     return NextResponse.json({
       products,
       total,
@@ -197,6 +220,7 @@ export async function GET(request: NextRequest) {
       brands: brands.map(b => b.manufacturer_name),
       categories: categories.map(c => c.category_airtable),
       seasons: seasons.map(s => s.attribute_value),
+      colors: colors.map(c => c.attribute_value),
     });
   } catch (error) {
     console.error('Products API error:', error);

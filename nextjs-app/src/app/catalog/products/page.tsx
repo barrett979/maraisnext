@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Check, X, Image as ImageIcon, FilterX } from 'lucide-react';
 import { ImageZoom } from '@/components/image-zoom';
 import { ProductDetailSheet } from '@/components/product-detail-sheet';
@@ -41,6 +42,7 @@ interface ProductsResponse {
   brands: string[];
   categories: string[];
   seasons: string[];
+  colors: string[];
   error?: string;
 }
 
@@ -56,6 +58,7 @@ export default function ProductsPage() {
   const [brands, setBrands] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [seasons, setSeasons] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Product detail sheet
@@ -67,6 +70,7 @@ export default function ProductsPage() {
   const brand = searchParams.get('brand') || '__all__';
   const category = searchParams.get('category') || '__all__';
   const season = searchParams.get('season') || '__all__';
+  const color = searchParams.get('color') || '__all__';
   const gender = searchParams.get('gender') || '__all__';
   const active = searchParams.get('active') || '__all__';
   const novinki = searchParams.get('novinki') || '__all__';
@@ -130,6 +134,7 @@ export default function ProductsPage() {
     if (brand && brand !== '__all__') params.set('brand', brand);
     if (category && category !== '__all__') params.set('category', category);
     if (season && season !== '__all__') params.set('season', season);
+    if (color && color !== '__all__') params.set('color', color);
     if (gender && gender !== '__all__') params.set('gender', gender);
     if (active && active !== '__all__') params.set('active', active);
     if (novinki && novinki !== '__all__') params.set('novinki', novinki);
@@ -163,6 +168,7 @@ export default function ProductsPage() {
       setBrands(data.brands || []);
       setCategories(data.categories || []);
       setSeasons(data.seasons || []);
+      setColors(data.colors || []);
     } catch (err) {
       console.error('Failed to fetch products:', err);
       setError('Failed to connect to database');
@@ -191,7 +197,7 @@ export default function ProductsPage() {
 
   // Check if any filter is active
   const hasActiveFilters = search || brand !== '__all__' || category !== '__all__' ||
-    season !== '__all__' || gender !== '__all__' || active !== '__all__' || novinki !== '__all__';
+    season !== '__all__' || color !== '__all__' || gender !== '__all__' || active !== '__all__' || novinki !== '__all__';
 
   // Show error state
   if (error) {
@@ -241,11 +247,11 @@ export default function ProductsPage() {
 
           {/* Brand */}
           <Select value={brand} onValueChange={(v) => setFilter('brand', v)}>
-            <SelectTrigger className={`h-9 w-auto min-w-[120px] ${brand !== '__all__' ? 'border-primary' : ''}`}>
+            <SelectTrigger className={`h-9 w-auto ${brand !== '__all__' ? 'border-primary' : ''}`}>
               <SelectValue placeholder={t('catalog.brand')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">{t('catalog.allBrands')}</SelectItem>
+              <SelectItem value="__all__">{t('catalog.brand')}</SelectItem>
               {(brands || []).map((b) => (
                 <SelectItem key={b} value={b}>{b}</SelectItem>
               ))}
@@ -254,11 +260,11 @@ export default function ProductsPage() {
 
           {/* Category */}
           <Select value={category} onValueChange={(v) => setFilter('category', v)}>
-            <SelectTrigger className={`h-9 w-auto min-w-[120px] ${category !== '__all__' ? 'border-primary' : ''}`}>
+            <SelectTrigger className={`h-9 w-auto ${category !== '__all__' ? 'border-primary' : ''}`}>
               <SelectValue placeholder={t('catalog.category')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">{t('catalog.allCategories')}</SelectItem>
+              <SelectItem value="__all__">{t('catalog.category')}</SelectItem>
               {(categories || []).map((c) => (
                 <SelectItem key={c} value={c}>{c}</SelectItem>
               ))}
@@ -267,24 +273,37 @@ export default function ProductsPage() {
 
           {/* Season */}
           <Select value={season} onValueChange={(v) => setFilter('season', v)}>
-            <SelectTrigger className={`h-9 w-auto min-w-[100px] ${season !== '__all__' ? 'border-primary' : ''}`}>
+            <SelectTrigger className={`h-9 w-auto ${season !== '__all__' ? 'border-primary' : ''}`}>
               <SelectValue placeholder={t('catalog.season')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">{t('catalog.allSeasons')}</SelectItem>
+              <SelectItem value="__all__">{t('catalog.season')}</SelectItem>
               {(seasons || []).map((s) => (
                 <SelectItem key={s} value={s}>{s}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
+          {/* Color */}
+          <Select value={color} onValueChange={(v) => setFilter('color', v)}>
+            <SelectTrigger className={`h-9 w-auto ${color !== '__all__' ? 'border-primary' : ''}`}>
+              <SelectValue placeholder={t('catalog.color')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">{t('catalog.color')}</SelectItem>
+              {(colors || []).map((c) => (
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           {/* Gender */}
           <Select value={gender} onValueChange={(v) => setFilter('gender', v)}>
-            <SelectTrigger className={`h-9 w-auto min-w-[100px] ${gender !== '__all__' ? 'border-primary' : ''}`}>
+            <SelectTrigger className={`h-9 w-auto ${gender !== '__all__' ? 'border-primary' : ''}`}>
               <SelectValue placeholder={t('catalog.gender')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">{t('catalog.allGenders')}</SelectItem>
+              <SelectItem value="__all__">{t('catalog.gender')}</SelectItem>
               <SelectItem value="жен">{t('catalog.female')}</SelectItem>
               <SelectItem value="муж">{t('catalog.male')}</SelectItem>
             </SelectContent>
@@ -292,11 +311,11 @@ export default function ProductsPage() {
 
           {/* Active */}
           <Select value={active} onValueChange={(v) => setFilter('active', v)}>
-            <SelectTrigger className={`h-9 w-auto min-w-[100px] ${active !== '__all__' ? 'border-primary' : ''}`}>
+            <SelectTrigger className={`h-9 w-auto ${active !== '__all__' ? 'border-primary' : ''}`}>
               <SelectValue placeholder={t('catalog.active')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">{t('catalog.allStatuses')}</SelectItem>
+              <SelectItem value="__all__">{t('catalog.active')}</SelectItem>
               <SelectItem value="true">{t('catalog.activeOnly')}</SelectItem>
               <SelectItem value="false">{t('catalog.inactiveOnly')}</SelectItem>
             </SelectContent>
@@ -304,11 +323,11 @@ export default function ProductsPage() {
 
           {/* Novinki */}
           <Select value={novinki} onValueChange={(v) => setFilter('novinki', v)}>
-            <SelectTrigger className={`h-9 w-auto min-w-[100px] ${novinki !== '__all__' ? 'border-primary' : ''}`}>
+            <SelectTrigger className={`h-9 w-auto ${novinki !== '__all__' ? 'border-primary' : ''}`}>
               <SelectValue placeholder={t('catalog.new')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">{t('catalog.allNovinki')}</SelectItem>
+              <SelectItem value="__all__">{t('catalog.new')}</SelectItem>
               <SelectItem value="true">{t('catalog.novinki')}</SelectItem>
               <SelectItem value="false">{t('catalog.notNovinki')}</SelectItem>
             </SelectContent>
@@ -329,7 +348,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Active Filters Badges */}
-        {(brand !== '__all__' || category !== '__all__' || season !== '__all__' || gender !== '__all__' || active !== '__all__' || novinki !== '__all__') && (
+        {(brand !== '__all__' || category !== '__all__' || season !== '__all__' || color !== '__all__' || gender !== '__all__' || active !== '__all__' || novinki !== '__all__') && (
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-xs text-muted-foreground mr-1">{t('common.activeFilters')}:</span>
             {brand !== '__all__' && (
@@ -352,6 +371,14 @@ export default function ProductsPage() {
               <Badge variant="secondary" className="gap-1 pr-1">
                 {season}
                 <button onClick={() => setFilter('season', '__all__')} className="ml-1 hover:text-destructive">
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {color !== '__all__' && (
+              <Badge variant="secondary" className="gap-1 pr-1">
+                {color}
+                <button onClick={() => setFilter('color', '__all__')} className="ml-1 hover:text-destructive">
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
@@ -405,11 +432,20 @@ export default function ProductsPage() {
               </TableHeader>
               <TableBody>
                 {loading && (products?.length || 0) === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={10} className="text-center py-8">
-                      {t('catalog.loading')}
-                    </TableCell>
-                  </TableRow>
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-12 w-12 rounded" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-4 mx-auto" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-8 mx-auto" /></TableCell>
+                    </TableRow>
+                  ))
                 ) : (products?.length || 0) === 0 ? (
                   <TableRow>
                     <TableCell colSpan={10} className="text-center py-8">
