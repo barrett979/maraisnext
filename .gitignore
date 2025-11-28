@@ -48,8 +48,6 @@ access_token*
 *.sqlite
 *.sqlite3
 # TEMP: Allow test databases for deployment
-!data/data.db
-!data/metadata.db
 *.db-journal
 *.db-wal
 *.db-shm
