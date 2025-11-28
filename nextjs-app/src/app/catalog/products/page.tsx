@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, Check, X, Sparkles, Image as ImageIcon, FilterX } from 'lucide-react';
+import { Search, Check, X, Image as ImageIcon, FilterX } from 'lucide-react';
 import { ImageZoom } from '@/components/image-zoom';
 import { ProductDetailSheet } from '@/components/product-detail-sheet';
 
@@ -488,7 +488,9 @@ export default function ProductsPage() {
                       {/* Novinki */}
                       <TableCell className="text-center">
                         {product.novinki && (
-                          <Sparkles className="h-4 w-4 text-yellow-500 mx-auto" />
+                          <Badge variant="outline" className="text-xs px-1.5 py-0 border-yellow-500 text-yellow-500 font-semibold">
+                            NEW
+                          </Badge>
                         )}
                       </TableCell>
                     </TableRow>

@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Check, X, Sparkles, Image as ImageIcon, ExternalLink } from 'lucide-react';
+import { Check, X, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { ImageZoom } from '@/components/image-zoom';
 
 interface ProductDetail {
@@ -155,56 +155,67 @@ export function ProductDetailSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col h-full">
-        <SheetHeader className="px-6 pt-6 pb-4 pr-12 space-y-3">
-          <SheetTitle className="text-left">
-            {loading ? (
+        <SheetHeader className="px-6 pt-6 pb-4 pr-12">
+          {loading ? (
+            <div className="space-y-2">
+              <SheetTitle className="sr-only">{t('catalog.loading')}</SheetTitle>
               <Skeleton className="h-6 w-48" />
-            ) : (
-              product?.name || t('catalog.loading')
-            )}
-          </SheetTitle>
-          {product?.sku && (
-            <SheetDescription className="text-left font-mono">
-              SKU: {product.sku}
-            </SheetDescription>
-          )}
-          {/* Status Badges */}
-          {product && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              <Badge variant={product.active ? 'default' : 'secondary'}>
-                {product.active ? (
-                  <><Check className="h-3 w-3 mr-1" /> {t('catalog.activeOnly')}</>
-                ) : (
-                  <><X className="h-3 w-3 mr-1" /> {t('catalog.inactiveOnly')}</>
-                )}
-              </Badge>
-              {product.novinki && (
-                <Badge variant="outline" className="border-yellow-500 text-yellow-600">
-                  <Sparkles className="h-3 w-3 mr-1" /> {t('catalog.novinki')}
-                </Badge>
-              )}
-              {product.sale && (
-                <Badge variant="destructive">{t('catalog.sale')}</Badge>
-              )}
+              <Skeleton className="h-4 w-32" />
             </div>
-          )}
-          {/* Open on site button */}
-          {product?.slug && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              asChild
-            >
-              <a
-                href={getProductUrl(product.slug)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                {t('catalog.openOnSite')}
-              </a>
-            </Button>
+          ) : product ? (
+            <div className="space-y-3">
+              {/* Title row with external link */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <SheetTitle className="text-left leading-tight">
+                    {product.name}
+                  </SheetTitle>
+                  {product.sku && (
+                    <SheetDescription className="text-left font-mono text-xs mt-1">
+                      {product.sku}
+                    </SheetDescription>
+                  )}
+                </div>
+                {product.slug && product.active && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 h-8 w-8"
+                    asChild
+                  >
+                    <a
+                      href={getProductUrl(product.slug)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={t('catalog.openOnSite')}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                )}
+              </div>
+              {/* Status badges - compact row */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <Badge
+                  variant={product.active ? 'default' : 'secondary'}
+                  className="text-xs px-2 py-0.5"
+                >
+                  {product.active ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                </Badge>
+                {product.novinki && (
+                  <Badge variant="outline" className="text-xs px-1.5 py-0 border-yellow-500 text-yellow-500 font-semibold">
+                    NEW
+                  </Badge>
+                )}
+                {product.sale && (
+                  <Badge variant="destructive" className="text-xs px-2 py-0.5">
+                    {t('catalog.sale')}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          ) : (
+            <SheetTitle className="sr-only">{t('catalog.products')}</SheetTitle>
           )}
         </SheetHeader>
 

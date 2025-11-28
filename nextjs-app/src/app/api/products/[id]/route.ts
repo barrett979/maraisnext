@@ -93,15 +93,24 @@ export async function GET(
       ORDER BY is_main DESC, position ASC NULLS LAST, id ASC
     `, [productId]);
 
-    // Get all attributes
+    // Get relevant attributes (exclude technical/internal ones)
+    const excludedAttributes = [
+      'cover_image_number',
+      'facebook_hidden_image',
+      'display_priority',
+      'swell_id',
+      'import_id',
+      'sync_status',
+    ];
     const attributes = await query<ProductAttribute>(`
       SELECT
         attribute_name,
         attribute_value
       FROM product_attributes
       WHERE product_id = $1
+        AND attribute_name NOT IN (${excludedAttributes.map((_, i) => `$${i + 2}`).join(', ')})
       ORDER BY attribute_name
-    `, [productId]);
+    `, [productId, ...excludedAttributes]);
 
     return NextResponse.json({
       product,

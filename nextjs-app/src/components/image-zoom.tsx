@@ -16,6 +16,18 @@ interface ImageZoomProps {
   thumbnailSize?: number;
 }
 
+// Allowed domains configured in next.config.ts
+const ALLOWED_DOMAINS = ['res.cloudinary.com', 'cdn.schema.io'];
+
+function isAllowedDomain(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname;
+    return ALLOWED_DOMAINS.some(domain => hostname === domain || hostname.endsWith(`.${domain}`));
+  } catch {
+    return false;
+  }
+}
+
 export function ImageZoom({
   src,
   alt,
@@ -23,6 +35,7 @@ export function ImageZoom({
   thumbnailSize = 48,
 }: ImageZoomProps) {
   const [open, setOpen] = useState(false);
+  const useNextImage = isAllowedDomain(src);
 
   return (
     <>
@@ -33,13 +46,22 @@ export function ImageZoom({
         className={`relative overflow-hidden bg-muted cursor-zoom-in transition-opacity hover:opacity-80 ${thumbnailClassName}`}
         style={{ width: thumbnailSize, height: thumbnailSize }}
       >
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className="object-cover"
-          sizes={`${thumbnailSize}px`}
-        />
+        {useNextImage ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            className="object-cover"
+            sizes={`${thumbnailSize}px`}
+          />
+        ) : (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={src}
+            alt={alt}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
       </button>
 
       {/* Zoomed Dialog */}
@@ -56,14 +78,23 @@ export function ImageZoom({
             onClick={() => setOpen(false)}
             className="cursor-zoom-out"
           >
-            <Image
-              src={src}
-              alt={alt}
-              width={800}
-              height={800}
-              className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg"
-              sizes="90vw"
-            />
+            {useNextImage ? (
+              <Image
+                src={src}
+                alt={alt}
+                width={800}
+                height={800}
+                className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg"
+                sizes="90vw"
+              />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={src}
+                alt={alt}
+                className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg"
+              />
+            )}
           </button>
         </DialogContent>
       </Dialog>

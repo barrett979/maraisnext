@@ -10,11 +10,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'example.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.example.com',
+        hostname: 'cdn.schema.io',
       },
     ],
   },
