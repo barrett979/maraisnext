@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronDown, Home, Megaphone, LogOut, Settings, User } from 'lucide-react';
+import { ChevronDown, Home, Megaphone, LogOut, Settings, User, Package } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import {
   Sidebar,
@@ -77,6 +77,9 @@ export function AppSidebar() {
   // Check if current path is within Marketing section
   const isMarketingSection = pathname.startsWith('/yandex-direct');
 
+  // Check if current path is within Catalog section
+  const isCatalogSection = pathname.startsWith('/catalog');
+
   // Get initials for avatar
   const getInitials = () => {
     if (user?.display_name) {
@@ -132,6 +135,30 @@ export function AppSidebar() {
                         <SidebarMenuSubButton asChild isActive={pathname.startsWith('/yandex-direct')}>
                           <Link href="/yandex-direct">
                             <span>{t('yandexDirect.title')}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              {/* Catalog - Collapsible */}
+              <Collapsible defaultOpen={isCatalogSection} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <Package className="h-4 w-4" />
+                      <span>{t('catalog.title')}</span>
+                      <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname.startsWith('/catalog/products')}>
+                          <Link href="/catalog/products">
+                            <span>{t('catalog.productsOnSite')}</span>
                           </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
