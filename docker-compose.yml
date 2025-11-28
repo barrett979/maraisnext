@@ -16,9 +16,16 @@ services:
       - wg-pihole
     labels:
       - "traefik.enable=true"
+      # HTTP router
       - "traefik.http.routers.metrika.rule=Host(`app.marais.ru`)"
       - "traefik.http.routers.metrika.entrypoints=web"
       - "traefik.http.routers.metrika.priority=100"
+      # HTTPS router
+      - "traefik.http.routers.metrika-secure.rule=Host(`app.marais.ru`)"
+      - "traefik.http.routers.metrika-secure.entrypoints=websecure"
+      - "traefik.http.routers.metrika-secure.priority=100"
+      - "traefik.http.routers.metrika-secure.tls=true"
+      # Service
       - "traefik.http.services.metrika.loadbalancer.server.port=3000"
 
 networks:
