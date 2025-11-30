@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronDown, Home, Megaphone, LogOut, Settings, User, Package } from 'lucide-react';
+import { ChevronDown, Home, Megaphone, LogOut, Settings, User, Package, ShoppingBag } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import {
   Sidebar,
@@ -80,6 +80,9 @@ export function AppSidebar() {
   // Check if current path is within Catalog section
   const isCatalogSection = pathname.startsWith('/catalog');
 
+  // Check if current path is within Pipeline section
+  const isPipelineSection = pathname.startsWith('/pipeline');
+
   // Get initials for avatar
   const getInitials = () => {
     if (user?.display_name) {
@@ -135,6 +138,30 @@ export function AppSidebar() {
                         <SidebarMenuSubButton asChild isActive={pathname.startsWith('/yandex-direct')}>
                           <Link href="/yandex-direct">
                             <span>{t('yandexDirect.title')}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              {/* Pipeline - Collapsible */}
+              <Collapsible defaultOpen={isPipelineSection} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <ShoppingBag className="h-4 w-4" />
+                      <span>{t('pipeline.title')}</span>
+                      <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname.startsWith('/pipeline/orders')}>
+                          <Link href="/pipeline/orders">
+                            <span>{t('pipeline.supplierOrders')}</span>
                           </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
