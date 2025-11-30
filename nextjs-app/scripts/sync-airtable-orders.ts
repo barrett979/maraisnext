@@ -121,6 +121,11 @@ function initDatabase(db: Database.Database) {
       archived INTEGER DEFAULT 0,
       discount_percent TEXT,
       storno TEXT,
+      task_proforma INTEGER DEFAULT 0,
+      task_acconto INTEGER DEFAULT 0,
+      task_fullfilled INTEGER DEFAULT 0,
+      task_saldo INTEGER DEFAULT 0,
+      task_ritirato INTEGER DEFAULT 0,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
@@ -163,11 +168,13 @@ async function main() {
     INSERT INTO pipeline_orders (
       airtable_id, order_id, order_date, supplier_id, brand, season,
       status, expected_delivery, invoices, gender, country, product,
-      notes, archived, discount_percent, storno
+      notes, archived, discount_percent, storno,
+      task_proforma, task_acconto, task_fullfilled, task_saldo, task_ritirato
     ) VALUES (
       ?, ?, ?, ?, ?, ?,
       ?, ?, ?, ?, ?, ?,
-      ?, ?, ?, ?
+      ?, ?, ?, ?,
+      ?, ?, ?, ?, ?
     )
   `);
 
@@ -192,7 +199,12 @@ async function main() {
         f.notes as string || null,
         f.archived ? 1 : 0,
         f.discount_percent as string || null,
-        f.storno as string || null
+        f.storno as string || null,
+        f.proforma ? 1 : 0,
+        f.acconto ? 1 : 0,
+        f.fullfilled ? 1 : 0,
+        f.saldo ? 1 : 0,
+        f.ritirato ? 1 : 0
       );
     }
   });

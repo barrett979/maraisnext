@@ -17,6 +17,11 @@ interface PipelineOrder {
   notes: string | null;
   archived: number;
   discount_percent: string | null;
+  task_proforma: number;
+  task_acconto: number;
+  task_fullfilled: number;
+  task_saldo: number;
+  task_ritirato: number;
   product_count: number;
   total_quantity: number;
   total_wholesale: number;

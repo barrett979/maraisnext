@@ -256,7 +256,13 @@
     "archived": "Архив",
     "country": "Страна",
     "gender": "Пол",
-    "productType": "Тип товара"
+    "productType": "Тип товара",
+    "tasks": "Задачи",
+    "taskProforma": "Проформа получена",
+    "taskAcconto": "Аванс оплачен",
+    "taskFullfilled": "Выполнено",
+    "taskSaldo": "Остаток оплачен",
+    "taskRitirato": "Получено"
   },
   "catalog": {
     "title": "Каталог",

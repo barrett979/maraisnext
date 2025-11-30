@@ -256,7 +256,13 @@
     "archived": "Archivio",
     "country": "Paese",
     "gender": "Genere",
-    "productType": "Tipo prodotto"
+    "productType": "Tipo prodotto",
+    "tasks": "Attività",
+    "taskProforma": "Proforma ricevuta",
+    "taskAcconto": "Acconto pagato",
+    "taskFullfilled": "Completato",
+    "taskSaldo": "Saldo pagato",
+    "taskRitirato": "Ritirato"
   },
   "catalog": {
     "title": "Catalogo",

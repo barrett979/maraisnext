@@ -14,6 +14,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { FileText, Wallet, ClipboardCheck, CreditCard, Truck } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
 interface PipelineOrder {
@@ -32,6 +34,11 @@ interface PipelineOrder {
   notes: string | null;
   archived: number;
   discount_percent: string | null;
+  task_proforma: number;
+  task_acconto: number;
+  task_fullfilled: number;
+  task_saldo: number;
+  task_ritirato: number;
   product_count: number;
   total_quantity: number;
   total_wholesale: number;
@@ -88,6 +95,41 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+function TaskIcon({ completed, icon: Icon, label }: { completed: boolean; icon: React.ElementType; label: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          className={`inline-flex items-center justify-center w-7 h-7 rounded ${
+            completed
+              ? 'bg-green-500 text-white'
+              : 'bg-muted text-muted-foreground'
+          }`}
+        >
+          <Icon className="h-4 w-4" />
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{label}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function TaskIcons({ order, t }: { order: PipelineOrder; t: (key: string) => string }) {
+  return (
+    <TooltipProvider>
+      <div className="flex gap-1">
+        <TaskIcon completed={!!order.task_proforma} icon={FileText} label={t('pipeline.taskProforma')} />
+        <TaskIcon completed={!!order.task_acconto} icon={Wallet} label={t('pipeline.taskAcconto')} />
+        <TaskIcon completed={!!order.task_fullfilled} icon={ClipboardCheck} label={t('pipeline.taskFullfilled')} />
+        <TaskIcon completed={!!order.task_saldo} icon={CreditCard} label={t('pipeline.taskSaldo')} />
+        <TaskIcon completed={!!order.task_ritirato} icon={Truck} label={t('pipeline.taskRitirato')} />
+      </div>
+    </TooltipProvider>
+  );
+}
+
 function OrdersTable({ orders, locale, t }: { orders: PipelineOrder[]; locale: string; t: (key: string) => string }) {
   if (orders.length === 0) {
     return (
@@ -106,6 +148,7 @@ function OrdersTable({ orders, locale, t }: { orders: PipelineOrder[]; locale: s
           <TableHead>{t('pipeline.supplier')}</TableHead>
           <TableHead>{t('pipeline.season')}</TableHead>
           <TableHead>{t('pipeline.status')}</TableHead>
+          <TableHead>{t('pipeline.tasks')}</TableHead>
           <TableHead className="text-right">{t('pipeline.products')}</TableHead>
           <TableHead className="text-right">{t('pipeline.quantity')}</TableHead>
           <TableHead className="text-right">{t('pipeline.total')}</TableHead>
@@ -124,6 +167,7 @@ function OrdersTable({ orders, locale, t }: { orders: PipelineOrder[]; locale: s
               ) : '-'}
             </TableCell>
             <TableCell>{getStatusBadge(order.status, t)}</TableCell>
+            <TableCell><TaskIcons order={order} t={t} /></TableCell>
             <TableCell className="text-right">{order.product_count || 0}</TableCell>
             <TableCell className="text-right">{order.total_quantity || 0}</TableCell>
             <TableCell className="text-right">
