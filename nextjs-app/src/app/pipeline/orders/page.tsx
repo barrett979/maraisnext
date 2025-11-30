@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useI18n } from '@/lib/i18n';
 
 interface PipelineOrder {
@@ -193,7 +194,10 @@ export default function PipelineOrdersPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('pipeline.supplierOrders')}</h1>
+        <div className="flex items-center gap-2">
+          <SidebarTrigger />
+          <h1 className="text-2xl font-bold">{t('pipeline.supplierOrders')}</h1>
+        </div>
         {activeData?.stats && (
           <div className="flex gap-4 text-sm text-muted-foreground">
             <span>{t('pipeline.inProgress')}: <strong>{activeData.stats.in_progress}</strong></span>
