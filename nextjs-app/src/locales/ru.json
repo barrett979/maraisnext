@@ -242,7 +242,7 @@
     "allOrders": "Все заказы",
     "orderId": "ID",
     "orderDate": "Дата заказа",
-    "brand": "Бренд",
+    "supplier": "Поставщик",
     "season": "Сезон",
     "status": "Статус",
     "expectedDelivery": "Ожидаемая доставка",

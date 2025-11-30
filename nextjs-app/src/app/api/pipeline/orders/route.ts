@@ -7,7 +7,7 @@ interface PipelineOrder {
   order_id: number;
   order_date: string | null;
   supplier_id: number | null;
-  brand: string | null;
+  supplier_name: string | null;
   season: string | null;
   status: string | null;
   expected_delivery: string | null;
@@ -28,15 +28,16 @@ export async function GET(request: NextRequest) {
 
   const db = getMetadataDb();
 
-  // Query orders with product counts from pipeline_products
-  // Join on order_id to get counts
+  // Query orders with product counts and supplier name
   let query = `
     SELECT
       o.*,
+      s.supplier_name,
       COALESCE(p.product_count, 0) as product_count,
       COALESCE(p.total_quantity, 0) as total_quantity,
       COALESCE(p.total_wholesale, 0) as total_wholesale
     FROM pipeline_orders o
+    LEFT JOIN pipeline_suppliers s ON o.supplier_id = s.supplier_id
     LEFT JOIN (
       SELECT
         order_id,

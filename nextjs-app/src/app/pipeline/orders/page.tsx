@@ -21,7 +21,7 @@ interface PipelineOrder {
   order_id: number;
   order_date: string | null;
   supplier_id: number | null;
-  brand: string | null;
+  supplier_name: string | null;
   season: string | null;
   status: string | null;
   expected_delivery: string | null;
@@ -102,7 +102,7 @@ function OrdersTable({ orders, locale, t }: { orders: PipelineOrder[]; locale: s
         <TableRow>
           <TableHead className="w-[60px]">{t('pipeline.orderId')}</TableHead>
           <TableHead>{t('pipeline.orderDate')}</TableHead>
-          <TableHead>{t('pipeline.brand')}</TableHead>
+          <TableHead>{t('pipeline.supplier')}</TableHead>
           <TableHead>{t('pipeline.season')}</TableHead>
           <TableHead>{t('pipeline.status')}</TableHead>
           <TableHead className="text-right">{t('pipeline.products')}</TableHead>
@@ -116,7 +116,7 @@ function OrdersTable({ orders, locale, t }: { orders: PipelineOrder[]; locale: s
           <TableRow key={order.id}>
             <TableCell className="font-medium">#{order.order_id}</TableCell>
             <TableCell>{formatDate(order.order_date, locale)}</TableCell>
-            <TableCell>{order.brand || '-'}</TableCell>
+            <TableCell>{order.supplier_name || '-'}</TableCell>
             <TableCell>
               {order.season ? (
                 <Badge variant="outline">{order.season}</Badge>

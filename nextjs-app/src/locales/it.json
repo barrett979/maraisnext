@@ -242,7 +242,7 @@
     "allOrders": "Tutti gli ordini",
     "orderId": "ID",
     "orderDate": "Data ordine",
-    "brand": "Brand",
+    "supplier": "Fornitore",
     "season": "Stagione",
     "status": "Stato",
     "expectedDelivery": "Consegna prevista",
