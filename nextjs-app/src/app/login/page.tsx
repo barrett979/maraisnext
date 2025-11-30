@@ -2,16 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { Loader2, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { t } = useI18n();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -32,7 +29,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || t('auth.loginError'));
+        setError(data.error || 'Error');
         setLoading(false);
         return;
       }
@@ -40,61 +37,55 @@ export default function LoginPage() {
       router.push('/');
       router.refresh();
     } catch {
-      setError(t('common.connectionError'));
+      setError('Connection error');
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">{t('yandexDirect.title')} Dashboard</CardTitle>
-          <p className="text-muted-foreground text-sm mt-2">
-            {t('auth.loginToView')}
-          </p>
+      <Card className="w-full max-w-sm">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+            <Lock className="h-6 w-6 text-muted-foreground" />
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">{t('auth.username')}</Label>
               <Input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder={t('auth.enterUsername')}
+                placeholder="Username"
                 required
                 autoComplete="username"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('auth.enterPassword')}
+                placeholder="Password"
                 required
                 autoComplete="current-password"
               />
             </div>
 
             {error && (
-              <div className="text-sm text-red-500 bg-red-500/10 p-3 rounded-md">
+              <div className="text-sm text-red-500 bg-red-500/10 p-3 rounded-md text-center">
                 {error}
               </div>
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('auth.loggingIn')}
-                </>
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                t('auth.login')
+                <Lock className="h-4 w-4" />
               )}
             </Button>
           </form>
