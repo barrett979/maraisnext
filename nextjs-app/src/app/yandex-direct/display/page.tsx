@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { PageFilters, useLocalFilters } from '@/components/page-filters';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n';
+import { Eye, MousePointerClick, Wallet, ShoppingCart, CircleDollarSign, Percent } from 'lucide-react';
 
 interface DisplayItem {
   campaign?: string;
@@ -219,10 +220,11 @@ export default function DisplayPage() {
         ) : (
           <>
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {t('metrics.impressions')}
                 </CardTitle>
+                <Eye className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -231,10 +233,11 @@ export default function DisplayPage() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {t('metrics.clicks')}
                 </CardTitle>
+                <MousePointerClick className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -243,10 +246,11 @@ export default function DisplayPage() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {t('metrics.cost')}
                 </CardTitle>
+                <Wallet className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -255,10 +259,11 @@ export default function DisplayPage() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {t('metrics.purchases')}
                 </CardTitle>
+                <ShoppingCart className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-400">
@@ -267,10 +272,11 @@ export default function DisplayPage() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {t('metrics.cpa')}
                 </CardTitle>
+                <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -279,10 +285,11 @@ export default function DisplayPage() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {t('metrics.cr')}
                 </CardTitle>
+                <Percent className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">

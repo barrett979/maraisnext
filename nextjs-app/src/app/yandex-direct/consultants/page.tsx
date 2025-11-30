@@ -264,7 +264,8 @@ function ScoreCard({ consultant, baseline, t, locale }: { consultant: Consultant
     )}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg" style={{ color: consultant.color }}>
+          <CardTitle className="flex items-center gap-2 text-lg" style={{ color: consultant.color }}>
+            <Users className="h-4 w-4" />
             {consultant.name}
           </CardTitle>
           <Badge variant={avgScore >= 70 ? 'default' : avgScore >= 50 ? 'secondary' : 'destructive'}>

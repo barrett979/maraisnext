@@ -181,6 +181,8 @@ next-env.d.ts
 # AI/LLM TOOLS
 # ============================================
 .claude/
+CLAUDE.md
+CLAUDE.local.md
 .cursor/
 .copilot/
 .aider*
