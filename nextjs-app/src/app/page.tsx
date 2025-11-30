@@ -61,18 +61,6 @@ interface OrdersData {
     end: string;
     days: number;
   };
-  ytd: {
-    currentYear: number;
-    prevYear: number;
-    current: {
-      revenue: number;
-      estimated: number;
-    };
-    previous: {
-      revenue: number;
-    };
-    yoyChange: number | null;
-  };
 }
 
 const CHART_COLORS = ['#4ade80', '#f87171', '#fb923c', '#60a5fa', '#a78bfa', '#f472b6', '#94a3b8', '#fbbf24'];
@@ -257,16 +245,16 @@ export default function HomePage() {
             <SelectItem value="7">7 {t('filters.days')}</SelectItem>
             <SelectItem value="30">30 {t('filters.days')}</SelectItem>
             <SelectItem value="90">90 {t('filters.days')}</SelectItem>
+            <SelectItem value="180">180 {t('filters.days')}</SelectItem>
             <SelectItem value="365">365 {t('filters.days')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {loading ? (
           <>
-            <KpiSkeleton />
             <KpiSkeleton />
             <KpiSkeleton />
             <KpiSkeleton />
@@ -308,14 +296,6 @@ export default function HomePage() {
               yoyChange={data.kpis.courierSuccessRate.yoyChange}
               icon={Truck}
               format="percent"
-            />
-            <RevenueKpiCard
-              title={`${t('orders.ytdRevenue')} ${data.ytd.currentYear}`}
-              value={data.ytd.current.revenue}
-              estimated={data.ytd.current.estimated}
-              yoyChange={data.ytd.yoyChange}
-              icon={TrendingUp}
-              confirmedLabel={t('orders.confirmed')}
             />
           </>
         ) : null}
