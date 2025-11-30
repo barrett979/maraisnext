@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 const SESSION_COOKIE = 'session';
 
 // Routes that don't require authentication
-const publicRoutes = ['/login', '/api/auth/login', '/api/auth/logout'];
+const publicRoutes = ['/login', '/api/auth/login', '/api/auth/logout', '/api/sync/scheduled'];
 
 // Check if path starts with any public route
 function isPublicRoute(pathname: string): boolean {
