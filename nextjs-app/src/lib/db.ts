@@ -8,9 +8,11 @@ const DATA_DIR = process.env.NODE_ENV === 'production'
   : path.join(process.cwd(), '..', 'data');
 const DB_PATH = path.join(DATA_DIR, 'data.db');
 const METADATA_DB_PATH = path.join(DATA_DIR, 'metadata.db');
+const YANDEX_DB_PATH = path.join(DATA_DIR, 'yandex_direct.db');
 
 let db: Database.Database | null = null;
 let metadataDb: Database.Database | null = null;
+let yandexDb: Database.Database | null = null;
 
 export function getDb(writable = false): Database.Database {
   if (writable) {
@@ -21,6 +23,13 @@ export function getDb(writable = false): Database.Database {
     db = new Database(DB_PATH, { readonly: true });
   }
   return db;
+}
+
+export function getYandexDb(): Database.Database {
+  if (!yandexDb) {
+    yandexDb = new Database(YANDEX_DB_PATH, { readonly: true });
+  }
+  return yandexDb;
 }
 
 export function getMetadataDb(): Database.Database {

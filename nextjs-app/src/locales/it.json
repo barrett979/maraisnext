@@ -18,7 +18,8 @@
     "user": "Utente",
     "admin": "Admin",
     "reset": "Azzera",
-    "activeFilters": "Filtri attivi"
+    "activeFilters": "Filtri attivi",
+    "noData": "Nessun dato"
   },
   "auth": {
     "login": "Accedi",
@@ -205,6 +206,21 @@
   "languages": {
     "ru": "Русский",
     "it": "Italiano"
+  },
+  "orders": {
+    "totalOrders": "Ordini",
+    "revenue": "Fatturato",
+    "completed": "Completati",
+    "completionRate": "Tasso compl.",
+    "avgTicket": "Scontrino medio",
+    "pending": "Da consegnare",
+    "confirmed": "Incassato",
+    "courierSuccess": "Successo consegne",
+    "ordersByDay": "Ordini per giorno",
+    "ordersByStatus": "Ordini per stato",
+    "courierSuccessRate": "Successo corrieri",
+    "orders": "Ordini",
+    "successRate": "Tasso successo"
   },
   "catalog": {
     "title": "Catalogo",

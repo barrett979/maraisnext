@@ -18,7 +18,8 @@
     "user": "Пользователь",
     "admin": "Администратор",
     "reset": "Сбросить",
-    "activeFilters": "Активные фильтры"
+    "activeFilters": "Активные фильтры",
+    "noData": "Нет данных"
   },
   "auth": {
     "login": "Войти",
@@ -205,6 +206,21 @@
   "languages": {
     "ru": "Русский",
     "it": "Italiano"
+  },
+  "orders": {
+    "totalOrders": "Заказы",
+    "revenue": "Выручка",
+    "completed": "Выполнено",
+    "completionRate": "Выполнение",
+    "avgTicket": "Ср. чек",
+    "pending": "К доставке",
+    "confirmed": "Получено",
+    "courierSuccess": "Успех доставки",
+    "ordersByDay": "Заказы по дням",
+    "ordersByStatus": "Заказы по статусам",
+    "courierSuccessRate": "Успешность курьеров",
+    "orders": "Заказы",
+    "successRate": "Успешность"
   },
   "catalog": {
     "title": "Каталог",
