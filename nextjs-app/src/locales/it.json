@@ -296,7 +296,22 @@
     "deleteProducts": "Elimina",
     "confirmDelete": "Conferma eliminazione",
     "confirmDeleteDescription": "Sei sicuro di voler eliminare {count} prodotto/i? Questa azione non può essere annullata.",
-    "clearSelection": "Deseleziona"
+    "clearSelection": "Deseleziona",
+    "statusInStock": "In magazzino",
+    "statusWaiting": "In attesa",
+    "statusCanceled": "Annullato",
+    "statusReady": "Pronto per ritiro",
+    "statusShipped": "Spedito",
+    "showStatus": "Mostra",
+    "hideStatus": "Nascondi",
+    "showAll": "Mostra tutti",
+    "status": {
+      "waiting": "In attesa",
+      "ready": "Pronto",
+      "canceled": "Annullato",
+      "in stock": "In stock",
+      "shipped": "Spedito"
+    }
   },
   "catalog": {
     "title": "Catalogo",

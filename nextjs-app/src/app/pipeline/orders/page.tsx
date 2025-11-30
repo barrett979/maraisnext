@@ -173,49 +173,52 @@ function OrdersTable({ orders, locale, t, onOrderClick }: { orders: PipelineOrde
         </TableRow>
       </TableHeader>
       <TableBody>
-        {orders.map((order) => (
-          <TableRow
-            key={order.id}
-            className="cursor-pointer hover:bg-muted/50"
-            onClick={() => onOrderClick(order.order_id)}
-          >
-            <TableCell className="font-medium">
-              <div className="flex items-center gap-2">
-                #{order.order_id}
-                {order.ready_quantity > 0 && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-medium">
-                          <AlertCircle className="h-3 w-3" />
-                          {order.ready_quantity}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {order.ready_quantity} {t('pipeline.readyToPickup')}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </div>
-            </TableCell>
-            <TableCell>{formatDate(order.order_date, locale)}</TableCell>
-            <TableCell>{order.supplier_name || '-'}</TableCell>
-            <TableCell>
-              {order.season ? (
-                <Badge variant="outline">{order.season}</Badge>
-              ) : '-'}
-            </TableCell>
-            <TableCell>{getStatusBadge(order.status, t)}</TableCell>
-            <TableCell><TaskDots order={order} t={t} /></TableCell>
-            <TableCell className="text-right">{order.product_count || 0}</TableCell>
-            <TableCell className="text-right">{order.total_quantity || 0}</TableCell>
-            <TableCell className="text-right">
-              {order.total_wholesale > 0 ? formatCurrency(order.total_wholesale) : '-'}
-            </TableCell>
-            <TableCell>{formatDate(order.expected_delivery, locale)}</TableCell>
-          </TableRow>
-        ))}
+        {orders.map((order) => {
+          const isCanceled = order.status === 'отменён';
+          return (
+            <TableRow
+              key={order.id}
+              className={`cursor-pointer hover:bg-muted/50 ${isCanceled ? 'opacity-50' : ''}`}
+              onClick={() => onOrderClick(order.order_id)}
+            >
+              <TableCell className={`font-medium ${isCanceled ? 'line-through' : ''}`}>
+                <div className="flex items-center gap-2">
+                  #{order.order_id}
+                  {order.ready_quantity > 0 && !isCanceled && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-medium">
+                            <AlertCircle className="h-3 w-3" />
+                            {order.ready_quantity}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {order.ready_quantity} {t('pipeline.readyToPickup')}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className={isCanceled ? 'line-through' : ''}>{formatDate(order.order_date, locale)}</TableCell>
+              <TableCell className={isCanceled ? 'line-through' : ''}>{order.supplier_name || '-'}</TableCell>
+              <TableCell className={isCanceled ? 'line-through' : ''}>
+                {order.season ? (
+                  <Badge variant="outline">{order.season}</Badge>
+                ) : '-'}
+              </TableCell>
+              <TableCell>{getStatusBadge(order.status, t)}</TableCell>
+              <TableCell><TaskDots order={order} t={t} /></TableCell>
+              <TableCell className={`text-right ${isCanceled ? 'line-through' : ''}`}>{order.product_count || 0}</TableCell>
+              <TableCell className={`text-right ${isCanceled ? 'line-through' : ''}`}>{order.total_quantity || 0}</TableCell>
+              <TableCell className={`text-right ${isCanceled ? 'line-through' : ''}`}>
+                {order.total_wholesale > 0 ? formatCurrency(order.total_wholesale) : '-'}
+              </TableCell>
+              <TableCell className={isCanceled ? 'line-through' : ''}>{formatDate(order.expected_delivery, locale)}</TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
@@ -223,9 +226,38 @@ function OrdersTable({ orders, locale, t, onOrderClick }: { orders: PipelineOrde
 
 function TableSkeleton() {
   return (
-    <div className="space-y-3">
-      {[...Array(5)].map((_, i) => (
-        <Skeleton key={i} className="h-12 w-full" />
+    <div className="space-y-1">
+      {/* Table header */}
+      <div className="flex items-center gap-4 h-10 px-4 border-b">
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-20" />
+      </div>
+      {/* Table rows */}
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="flex items-center gap-4 h-12 px-4 border-b">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-5 w-14 rounded-full" />
+          <Skeleton className="h-5 w-20 rounded-full" />
+          <div className="flex gap-0.5">
+            {[...Array(5)].map((_, j) => (
+              <Skeleton key={j} className="h-2 w-2 rounded-full" />
+            ))}
+          </div>
+          <Skeleton className="h-4 w-8 ml-auto" />
+          <Skeleton className="h-4 w-8" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-20" />
+        </div>
       ))}
     </div>
   );

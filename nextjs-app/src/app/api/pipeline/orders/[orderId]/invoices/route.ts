@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMetadataDb } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import { v2 as cloudinary } from 'cloudinary';
 
 // Configure Cloudinary
@@ -15,12 +16,31 @@ interface InvoiceInfo {
   type?: string;
 }
 
+// Allowed MIME types for invoice uploads
+const ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+];
+
+// Max file size: 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { orderId } = await params;
-  const orderIdNum = parseInt(orderId);
+  const orderIdNum = Number(orderId);
+  if (!Number.isInteger(orderIdNum) || orderIdNum <= 0) {
+    return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
+  }
 
   try {
     const formData = await request.formData();
@@ -28,6 +48,22 @@ export async function POST(
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    }
+
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: `Invalid file type. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: `File too large. Max size: ${MAX_FILE_SIZE / 1024 / 1024}MB` },
+        { status: 400 }
+      );
     }
 
     // Convert file to base64 for Cloudinary upload
@@ -92,8 +128,16 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { orderId } = await params;
-  const orderIdNum = parseInt(orderId);
+  const orderIdNum = Number(orderId);
+  if (!Number.isInteger(orderIdNum) || orderIdNum <= 0) {
+    return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
+  }
 
   try {
     const { filename } = await request.json();

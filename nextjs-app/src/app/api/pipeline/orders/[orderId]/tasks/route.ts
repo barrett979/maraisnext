@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMetadataDb } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || 'appDgAaPpN2ZNh0Cx';
@@ -29,7 +30,16 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { orderId } = await params;
+  const orderIdNum = Number(orderId);
+  if (!Number.isInteger(orderIdNum) || orderIdNum <= 0) {
+    return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
+  }
 
   try {
     const body = await request.json();
@@ -58,7 +68,7 @@ export async function PATCH(
       SELECT airtable_id, task_proforma, task_acconto, task_fullfilled, task_saldo, task_ritirato
       FROM pipeline_orders
       WHERE order_id = ?
-    `).get(parseInt(orderId)) as OrderRecord | undefined;
+    `).get(orderIdNum) as OrderRecord | undefined;
 
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
@@ -98,14 +108,14 @@ export async function PATCH(
       UPDATE pipeline_orders
       SET ${task} = ?, updated_at = CURRENT_TIMESTAMP
       WHERE order_id = ?
-    `).run(sqliteValue, parseInt(orderId));
+    `).run(sqliteValue, orderIdNum);
 
     // Return updated task values
     const updatedOrder = db.prepare(`
       SELECT task_proforma, task_acconto, task_fullfilled, task_saldo, task_ritirato
       FROM pipeline_orders
       WHERE order_id = ?
-    `).get(parseInt(orderId)) as Omit<OrderRecord, 'airtable_id'>;
+    `).get(orderIdNum) as Omit<OrderRecord, 'airtable_id'>;
 
     return NextResponse.json({
       success: true,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMetadataDb } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 
 interface PaymentInput {
   payment_date: string;
@@ -11,10 +12,14 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
-  const { orderId } = await params;
-  const orderIdNum = parseInt(orderId);
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-  if (isNaN(orderIdNum)) {
+  const { orderId } = await params;
+  const orderIdNum = Number(orderId);
+  if (!Number.isInteger(orderIdNum) || orderIdNum <= 0) {
     return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
   }
 

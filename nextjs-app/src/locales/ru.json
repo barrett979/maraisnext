@@ -296,7 +296,22 @@
     "deleteProducts": "Удалить",
     "confirmDelete": "Подтвердите удаление",
     "confirmDeleteDescription": "Вы уверены, что хотите удалить {count} товар(ов)? Это действие нельзя отменить.",
-    "clearSelection": "Снять выбор"
+    "clearSelection": "Снять выбор",
+    "statusInStock": "На складе",
+    "statusWaiting": "В ожидании",
+    "statusCanceled": "Отменён",
+    "statusReady": "Готов к выдаче",
+    "statusShipped": "Отправлен",
+    "showStatus": "Показать",
+    "hideStatus": "Скрыть",
+    "showAll": "Показать все",
+    "status": {
+      "waiting": "В ожидании",
+      "ready": "Готов к выдаче",
+      "canceled": "Отменён",
+      "in stock": "На складе",
+      "shipped": "Отправлен"
+    }
   },
   "catalog": {
     "title": "Каталог",

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMetadataDb } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 
 interface PipelineProduct {
   id: number;
@@ -60,7 +61,16 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { orderId } = await params;
+  const orderIdNum = Number(orderId);
+  if (!Number.isInteger(orderIdNum) || orderIdNum <= 0) {
+    return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
+  }
 
   const db = getMetadataDb();
 
@@ -72,7 +82,7 @@ export async function GET(
     FROM pipeline_orders o
     LEFT JOIN pipeline_suppliers s ON o.supplier_id = s.supplier_id
     WHERE o.order_id = ?
-  `).get(parseInt(orderId)) as PipelineOrderDetail | undefined;
+  `).get(orderIdNum) as PipelineOrderDetail | undefined;
 
   if (!order) {
     return NextResponse.json({ error: 'Order not found' }, { status: 404 });
@@ -88,7 +98,7 @@ export async function GET(
     FROM pipeline_products
     WHERE order_id = ?
     ORDER BY supplier_sku
-  `).all(parseInt(orderId)) as PipelineProduct[];
+  `).all(orderIdNum) as PipelineProduct[];
 
   // Get payments for this order
   const payments = db.prepare(`
@@ -96,7 +106,7 @@ export async function GET(
     FROM pipeline_payments
     WHERE order_id = ?
     ORDER BY payment_date DESC
-  `).all(parseInt(orderId)) as PipelinePayment[];
+  `).all(orderIdNum) as PipelinePayment[];
 
   // Calculate totals
   const totalPaid = payments.reduce((sum, p) => sum + (p.amount_eur || 0), 0);
@@ -120,10 +130,14 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
-  const { orderId } = await params;
-  const orderIdNum = parseInt(orderId);
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-  if (isNaN(orderIdNum)) {
+  const { orderId } = await params;
+  const orderIdNum = Number(orderId);
+  if (!Number.isInteger(orderIdNum) || orderIdNum <= 0) {
     return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
   }
 
