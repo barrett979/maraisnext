@@ -22,8 +22,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
   Cell,
   BarChart,
   Bar,
@@ -51,7 +49,6 @@ interface OrdersData {
   };
   charts: {
     ordersByDay: Array<{ day: string; orders: number; revenue: number }>;
-    ordersByStatus: Array<{ status: string; count: number }>;
     courierSuccess: Array<{
       courier: string;
       total_orders: number;
@@ -64,20 +61,19 @@ interface OrdersData {
     end: string;
     days: number;
   };
+  ytd: {
+    currentYear: number;
+    prevYear: number;
+    current: {
+      revenue: number;
+      estimated: number;
+    };
+    previous: {
+      revenue: number;
+    };
+    yoyChange: number | null;
+  };
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  'Выполнен': '#4ade80',
-  'Отменен': '#f87171',
-  'Возврат Закрыт': '#fb923c',
-  'Оформлен в ТК': '#60a5fa',
-  'Подтвержден': '#a78bfa',
-  'Возврат Товар получен': '#f472b6',
-  'Нет ответа': '#94a3b8',
-  'Перенос': '#fbbf24',
-  'Собран': '#2dd4bf',
-  'Собрать': '#818cf8',
-};
 
 const CHART_COLORS = ['#4ade80', '#f87171', '#fb923c', '#60a5fa', '#a78bfa', '#f472b6', '#94a3b8', '#fbbf24'];
 
@@ -267,9 +263,10 @@ export default function HomePage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {loading ? (
           <>
+            <KpiSkeleton />
             <KpiSkeleton />
             <KpiSkeleton />
             <KpiSkeleton />
@@ -312,102 +309,61 @@ export default function HomePage() {
               icon={Truck}
               format="percent"
             />
+            <RevenueKpiCard
+              title={`${t('orders.ytdRevenue')} ${data.ytd.currentYear}`}
+              value={data.ytd.current.revenue}
+              estimated={data.ytd.current.estimated}
+              yoyChange={data.ytd.yoyChange}
+              icon={TrendingUp}
+              confirmedLabel={t('orders.confirmed')}
+            />
           </>
         ) : null}
       </div>
 
-      {/* Orders by Day Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('orders.ordersByDay')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <Skeleton className="h-[300px] w-full" />
-          ) : data?.charts.ordersByDay && data.charts.ordersByDay.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.charts.ordersByDay}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis
-                  dataKey="day"
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => {
-                    const date = new Date(value);
-                    return `${date.getDate()}/${date.getMonth() + 1}`;
-                  }}
-                />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                  }}
-                  formatter={(value: number, name: string) => [
-                    name === 'orders' ? value : formatCurrency(value),
-                    name === 'orders' ? t('orders.orders') : t('orders.revenue'),
-                  ]}
-                  labelFormatter={(label) => new Date(label).toLocaleDateString('ru-RU')}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="orders"
-                  stroke="#4ade80"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              {t('common.noData')}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Bottom Charts Row */}
+      {/* Charts Row - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Orders by Status */}
+        {/* Orders by Day Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('orders.ordersByStatus')}</CardTitle>
+            <CardTitle>{t('orders.ordersByDay')}</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
               <Skeleton className="h-[300px] w-full" />
-            ) : data?.charts.ordersByStatus && data.charts.ordersByStatus.length > 0 ? (
+            ) : data?.charts.ordersByDay && data.charts.ordersByDay.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={data.charts.ordersByStatus}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ payload, percent }: { payload?: { status: string }; percent?: number }) => {
-                      const p = percent ?? 0;
-                      const status = payload?.status ?? '';
-                      return p > 0.05 ? `${status.slice(0, 10)}${status.length > 10 ? '...' : ''} ${(p * 100).toFixed(0)}%` : '';
+                <LineChart data={data.charts.ordersByDay}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      return `${date.getDate()}/${date.getMonth() + 1}`;
                     }}
-                    outerRadius={100}
-                    dataKey="count"
-                  >
-                    {data.charts.ordersByStatus.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={STATUS_COLORS[entry.status] || CHART_COLORS[index % CHART_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
+                  />
+                  <YAxis tick={{ fontSize: 12 }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
                     }}
-                    formatter={(value: number) => [value, t('orders.orders')]}
+                    formatter={(value: number, name: string) => [
+                      name === 'orders' ? value : formatCurrency(value),
+                      name === 'orders' ? t('orders.orders') : t('orders.revenue'),
+                    ]}
+                    labelFormatter={(label) => new Date(label).toLocaleDateString('ru-RU')}
                   />
-                </PieChart>
+                  <Line
+                    type="monotone"
+                    dataKey="orders"
+                    stroke="#4ade80"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-muted-foreground">

@@ -13,7 +13,14 @@
  *   npx tsx scripts/sync-orders.ts 5000     # Import last 5000 orders
  */
 
-import 'dotenv/config';
+// Load dotenv only in development (production uses environment variables)
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    require('dotenv/config');
+  } catch {
+    // dotenv not available, continue without it
+  }
+}
 import Database from 'better-sqlite3';
 import path from 'path';
 
