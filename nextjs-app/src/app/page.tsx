@@ -444,7 +444,7 @@ export default function HomePage() {
                     <Bar
                       dataKey="success_rate"
                       radius={[0, 4, 4, 0]}
-                      label={{ position: 'right', fontSize: 11, formatter: (v: number) => `${v}%` }}
+                      label={{ position: 'right', fontSize: 11, formatter: (v) => `${v}%` }}
                     >
                       {data.charts.courierSuccess.map((entry, index) => (
                         <Cell
