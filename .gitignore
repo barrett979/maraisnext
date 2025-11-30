@@ -198,3 +198,6 @@ reports/
 *.xlsx
 !templates/*.csv
 !templates/*.xlsx
+
+# Airtable sync scripts (local only, contain API keys in usage)
+nextjs-app/scripts/sync-airtable-*.ts

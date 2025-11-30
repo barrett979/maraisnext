@@ -25,6 +25,7 @@ interface PipelineOrder {
   product_count: number;
   total_quantity: number;
   total_wholesale: number;
+  ready_quantity: number;
 }
 
 export async function GET(request: NextRequest) {
@@ -40,7 +41,8 @@ export async function GET(request: NextRequest) {
       s.supplier_name,
       COALESCE(p.product_count, 0) as product_count,
       COALESCE(p.total_quantity, 0) as total_quantity,
-      COALESCE(p.total_wholesale, 0) as total_wholesale
+      COALESCE(p.total_wholesale, 0) as total_wholesale,
+      COALESCE(p.ready_quantity, 0) as ready_quantity
     FROM pipeline_orders o
     LEFT JOIN pipeline_suppliers s ON o.supplier_id = s.supplier_id
     LEFT JOIN (
@@ -48,7 +50,8 @@ export async function GET(request: NextRequest) {
         order_id,
         COUNT(*) as product_count,
         SUM(quantity) as total_quantity,
-        SUM(wholesale_price * quantity) as total_wholesale
+        SUM(wholesale_price * quantity) as total_wholesale,
+        SUM(CASE WHEN status = 'ready' THEN quantity ELSE 0 END) as ready_quantity
       FROM pipeline_products
       WHERE order_id IS NOT NULL
       GROUP BY order_id

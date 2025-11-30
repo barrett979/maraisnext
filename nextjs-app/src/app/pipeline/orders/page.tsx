@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -15,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { FileText, Wallet, ClipboardCheck, CreditCard, Truck } from 'lucide-react';
+import { Check, X, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
 interface PipelineOrder {
@@ -42,6 +43,7 @@ interface PipelineOrder {
   product_count: number;
   total_quantity: number;
   total_wholesale: number;
+  ready_quantity: number;
 }
 
 interface OrdersResponse {
@@ -95,42 +97,57 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-function TaskIcon({ completed, icon: Icon, label }: { completed: boolean; icon: React.ElementType; label: string }) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span
-          className={`inline-flex items-center justify-center w-7 h-7 rounded ${
-            completed
-              ? 'bg-green-500 text-white'
-              : 'bg-muted text-muted-foreground'
-          }`}
-        >
-          <Icon className="h-4 w-4" />
-        </span>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>{label}</p>
-      </TooltipContent>
-    </Tooltip>
-  );
-}
+function TaskDots({ order, t }: { order: PipelineOrder; t: (key: string) => string }) {
+  const tasks = [
+    { done: !!order.task_proforma, label: t('pipeline.taskProforma') },
+    { done: !!order.task_acconto, label: t('pipeline.taskAcconto') },
+    { done: !!order.task_fullfilled, label: t('pipeline.taskFullfilled') },
+    { done: !!order.task_saldo, label: t('pipeline.taskSaldo') },
+    { done: !!order.task_ritirato, label: t('pipeline.taskRitirato') },
+  ];
 
-function TaskIcons({ order, t }: { order: PipelineOrder; t: (key: string) => string }) {
+  const completed = tasks.filter(t => t.done).length;
+
   return (
     <TooltipProvider>
-      <div className="flex gap-1">
-        <TaskIcon completed={!!order.task_proforma} icon={FileText} label={t('pipeline.taskProforma')} />
-        <TaskIcon completed={!!order.task_acconto} icon={Wallet} label={t('pipeline.taskAcconto')} />
-        <TaskIcon completed={!!order.task_fullfilled} icon={ClipboardCheck} label={t('pipeline.taskFullfilled')} />
-        <TaskIcon completed={!!order.task_saldo} icon={CreditCard} label={t('pipeline.taskSaldo')} />
-        <TaskIcon completed={!!order.task_ritirato} icon={Truck} label={t('pipeline.taskRitirato')} />
-      </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center gap-1 cursor-default">
+            <div className="flex gap-0.5">
+              {tasks.map((task, i) => (
+                <span
+                  key={i}
+                  className={`w-2 h-2 rounded-full ${
+                    task.done ? 'bg-green-500' : 'bg-muted-foreground/30'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-muted-foreground ml-1">
+              {completed}/{tasks.length}
+            </span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="space-y-1 text-sm">
+            {tasks.map((task, i) => (
+              <div key={i} className="flex items-center gap-2">
+                {task.done ? (
+                  <Check className="h-3 w-3 text-green-500" />
+                ) : (
+                  <X className="h-3 w-3 text-muted-foreground" />
+                )}
+                <span className={task.done ? '' : 'text-muted-foreground'}>{task.label}</span>
+              </div>
+            ))}
+          </div>
+        </TooltipContent>
+      </Tooltip>
     </TooltipProvider>
   );
 }
 
-function OrdersTable({ orders, locale, t }: { orders: PipelineOrder[]; locale: string; t: (key: string) => string }) {
+function OrdersTable({ orders, locale, t, onOrderClick }: { orders: PipelineOrder[]; locale: string; t: (key: string) => string; onOrderClick: (orderId: number) => void }) {
   if (orders.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -157,8 +174,31 @@ function OrdersTable({ orders, locale, t }: { orders: PipelineOrder[]; locale: s
       </TableHeader>
       <TableBody>
         {orders.map((order) => (
-          <TableRow key={order.id}>
-            <TableCell className="font-medium">#{order.order_id}</TableCell>
+          <TableRow
+            key={order.id}
+            className="cursor-pointer hover:bg-muted/50"
+            onClick={() => onOrderClick(order.order_id)}
+          >
+            <TableCell className="font-medium">
+              <div className="flex items-center gap-2">
+                #{order.order_id}
+                {order.ready_quantity > 0 && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-medium">
+                          <AlertCircle className="h-3 w-3" />
+                          {order.ready_quantity}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {order.ready_quantity} {t('pipeline.readyToPickup')}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+            </TableCell>
             <TableCell>{formatDate(order.order_date, locale)}</TableCell>
             <TableCell>{order.supplier_name || '-'}</TableCell>
             <TableCell>
@@ -167,7 +207,7 @@ function OrdersTable({ orders, locale, t }: { orders: PipelineOrder[]; locale: s
               ) : '-'}
             </TableCell>
             <TableCell>{getStatusBadge(order.status, t)}</TableCell>
-            <TableCell><TaskIcons order={order} t={t} /></TableCell>
+            <TableCell><TaskDots order={order} t={t} /></TableCell>
             <TableCell className="text-right">{order.product_count || 0}</TableCell>
             <TableCell className="text-right">{order.total_quantity || 0}</TableCell>
             <TableCell className="text-right">
@@ -193,11 +233,16 @@ function TableSkeleton() {
 
 export default function PipelineOrdersPage() {
   const { t, locale } = useI18n();
+  const router = useRouter();
   const [activeData, setActiveData] = useState<OrdersResponse | null>(null);
   const [allData, setAllData] = useState<OrdersResponse | null>(null);
   const [loadingActive, setLoadingActive] = useState(true);
   const [loadingAll, setLoadingAll] = useState(false);
   const [activeTab, setActiveTab] = useState('active');
+
+  const handleOrderClick = (orderId: number) => {
+    router.push(`/pipeline/orders/${orderId}`);
+  };
 
   useEffect(() => {
     const fetchActive = async () => {
@@ -279,7 +324,7 @@ export default function PipelineOrdersPage() {
             loadingActive ? (
               <TableSkeleton />
             ) : activeData ? (
-              <OrdersTable orders={activeData.orders} locale={locale} t={t} />
+              <OrdersTable orders={activeData.orders} locale={locale} t={t} onOrderClick={handleOrderClick} />
             ) : null
           )}
 
@@ -287,7 +332,7 @@ export default function PipelineOrdersPage() {
             loadingAll ? (
               <TableSkeleton />
             ) : allData ? (
-              <OrdersTable orders={allData.orders} locale={locale} t={t} />
+              <OrdersTable orders={allData.orders} locale={locale} t={t} onOrderClick={handleOrderClick} />
             ) : null
           )}
         </CardContent>
