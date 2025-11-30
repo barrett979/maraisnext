@@ -384,9 +384,11 @@ export default function HomePage() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ status, percent }) =>
-                      percent > 0.05 ? `${status.slice(0, 10)}${status.length > 10 ? '...' : ''} ${(percent * 100).toFixed(0)}%` : ''
-                    }
+                    label={({ payload, percent }: { payload?: { status: string }; percent?: number }) => {
+                      const p = percent ?? 0;
+                      const status = payload?.status ?? '';
+                      return p > 0.05 ? `${status.slice(0, 10)}${status.length > 10 ? '...' : ''} ${(p * 100).toFixed(0)}%` : '';
+                    }}
                     outerRadius={100}
                     dataKey="count"
                   >
