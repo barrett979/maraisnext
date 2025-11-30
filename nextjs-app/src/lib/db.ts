@@ -63,6 +63,21 @@ export function getMetadataDb(): Database.Database {
     metadataDb.exec(`
       INSERT OR IGNORE INTO sync_status (id, last_sync_status) VALUES (1, 'never')
     `);
+    // Crea tabella sync_settings per sincronizzazione automatica
+    metadataDb.exec(`
+      CREATE TABLE IF NOT EXISTS sync_settings (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        yandex_enabled INTEGER DEFAULT 0,
+        yandex_hour INTEGER DEFAULT 6,
+        moysklad_enabled INTEGER DEFAULT 0,
+        moysklad_hour INTEGER DEFAULT 7,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    // Inserisci riga iniziale se non esiste
+    metadataDb.exec(`
+      INSERT OR IGNORE INTO sync_settings (id) VALUES (1)
+    `);
     // Migra vecchi dati se esiste colonna campaign invece di campaign_id
     try {
       const hasOldColumn = metadataDb.prepare("PRAGMA table_info(campaign_metadata)").all() as Array<{name: string}>;

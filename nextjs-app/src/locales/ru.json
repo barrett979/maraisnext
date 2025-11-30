@@ -201,7 +201,18 @@
     "syncing": "Синхронизация...",
     "syncNow": "Синхронизировать",
     "syncError": "Ошибка синхронизации",
-    "never": "Никогда"
+    "never": "Никогда",
+    "title": "Синхронизации",
+    "subtitle": "Настройка автоматической ежедневной синхронизации",
+    "yandexDirect": "Yandex Direct",
+    "yandexDescription": "Синхронизация данных кампаний и метрик",
+    "moysklad": "MoySklad",
+    "moyskladDescription": "Синхронизация заказов (последние 1000)",
+    "enabled": "Включено",
+    "disabled": "Отключено",
+    "syncTime": "Время sync (Москва)",
+    "settingsSaved": "Настройки сохранены",
+    "settingsError": "Ошибка сохранения"
   },
   "languages": {
     "ru": "Русский",
